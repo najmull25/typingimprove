@@ -96,8 +96,6 @@ function showPassage() {
   if (isCustomMode) {
     passageBox.textContent = '';
   } else {
-    // textContent preserves the original text.
-    // CSS white-space: pre-wrap displays new lines.
     passageBox.textContent = getCurrentPassage();
   }
 }
@@ -118,6 +116,10 @@ function resetTest() {
 
   $('typingInput').value = '';
   $('typingInput').disabled = true;
+
+  // Reset both scroll positions
+  $('typingInput').scrollTop = 0;
+  $('passage').scrollTop = 0;
 
   $('startBtn').disabled = false;
   $('startBtn').textContent = 'Start Test';
@@ -329,19 +331,41 @@ $('startBtn').addEventListener('click', () => {
 });
 
 
-// ================= TYPING INPUT =================
+// ================= TYPING INPUT & SCROLL SYNC =================
 
-$('typingInput').addEventListener('input', () => {
+const typingBox = $('typingInput');
+const passageBox = $('passage');
+
+// Synchronize the scroll positions of both boxes
+function syncPassageScroll() {
+  if (isCustomMode) return;
+
+  if (!typingBox || !passageBox) return;
+
+  passageBox.scrollTop = typingBox.scrollTop;
+}
+
+
+// Update statistics and synchronize scrolling while typing
+typingBox.addEventListener('input', () => {
   if (!started || finished) return;
 
   updateStats();
 
+  syncPassageScroll();
+
   if (
     !isCustomMode &&
-    $('typingInput').value.length >= getCurrentPassage().length
+    typingBox.value.length >= getCurrentPassage().length
   ) {
     finishTest();
   }
+});
+
+
+// Also synchronize when the typing box is scrolled manually
+typingBox.addEventListener('scroll', () => {
+  syncPassageScroll();
 });
 
 
@@ -351,19 +375,16 @@ $('savePassage').addEventListener('click', () => {
 
   const title = $('passageTitle').value.trim();
 
-  // Do not trim the actual passage text.
-  // This preserves Enter, blank lines and spaces.
+  // Preserve the original passage text
   const text = $('newPassage').value;
 
   const lang = $('language').value;
 
-  // Check whether the text is empty without changing it.
   if (!title || !text.trim()) {
     alert('Passage Title এবং Text লিখুন!');
     return;
   }
 
-  // Save the original text exactly as entered.
   passageLibrary[lang].push({
     title: title,
     text: text,
@@ -374,18 +395,14 @@ $('savePassage').addEventListener('click', () => {
     JSON.stringify(passageLibrary)
   );
 
-  // Reload passage list.
   loadPassages();
 
-  // Automatically select the newly added passage.
   $('passageSelect').value =
     passageLibrary[lang].length - 1;
 
-  // Clear input fields.
   $('passageTitle').value = '';
   $('newPassage').value = '';
 
-  // Reset test and display the new passage.
   resetTest();
 
   $('saveMessage').textContent =
