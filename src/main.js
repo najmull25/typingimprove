@@ -5,7 +5,24 @@ const $ = (id) => document.getElementById(id);
 
 const defaultPassages = {
   en: [
-    { title: 'English Passage 1', text: 'Education is one of the most important things in human life. It helps us develop knowledge, skills and good character. An educated person can make better decisions and contribute to society.' },
+    {
+  title: 'English Passage 1',
+  text: `Education has always been one of the most powerful forces behind human progress. It shapes the way people think, influences their decisions, creates opportunities for personal development and determines the direction of national growth.
+
+Throughout history, societies have depended on education to develop skilled individuals, strengthen institutions and improve living standards. However, the methods through which people acquire knowledge have changed considerably over time.
+
+From traditional classrooms and printed textbooks to computers, smartphones and artificial intelligence, the educational landscape has experienced a remarkable transformation. Today, digital technology is not simply an additional resource for students and teachers; it is gradually becoming an important part of the entire learning process.
+
+The expansion of the internet has fundamentally changed the relationship between individuals and information. In earlier generations, students generally depended on teachers, libraries and printed educational materials to understand different subjects.
+
+Access to specialised knowledge was often restricted by geographical location, financial circumstances and the availability of educational institutions. A student living in a remote village might have had limited opportunities to consult experienced teachers or access advanced learning materials.
+
+Today, however, the internet has created possibilities that were almost unimaginable for previous generations. A student with an appropriate digital device and a reliable internet connection can explore scientific discoveries, study historical developments, attend educational lectures and communicate with learners from different parts of the world.
+
+This transformation has created a new understanding of education. Learning is no longer necessarily restricted to a particular classroom, institution or period of life. People can acquire knowledge independently, participate in online programmes and develop professional skills without following the traditional educational route.
+
+The increasing availability of digital resources has also encouraged individuals to take greater responsibility for their own learning. Nevertheless, technological progress has brought complicated questions about educational quality, equal access, academic honesty and the changing responsibilities of teachers.`
+},
     { title: 'English Passage 2', text: 'Technology has changed the way we live, work and communicate. Computers and the internet have made information available to everyone. Modern technology saves time and makes many tasks easier.' },
     { title: 'English Passage 3', text: 'Discipline is essential for success in life. It teaches us to follow rules, respect others and use our time wisely. A disciplined person can achieve goals through regular effort.' },
     { title: 'English Passage 4', text: 'Trees are very important for the environment. They provide oxygen, fruits, wood and shelter for birds and animals. We should plant more trees and protect forests for future generations.' },
