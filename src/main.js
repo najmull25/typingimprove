@@ -903,3 +903,18 @@ loadPassages();
 resetTest();
 
 renderDashboard();
+// ================= RESET BUTTON =================
+
+$('resetBtn').addEventListener(
+  'click',
+  resetTest
+);
+// ================= END BUTTON =================
+
+$('endBtn').addEventListener('click', () => {
+
+  if (!started || finished) return;
+
+  finishTest();
+
+});
