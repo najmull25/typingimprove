@@ -43,7 +43,19 @@ Even today, these characteristics remain valuable because education involves muc
 
 However, traditional educational methods have not always been equally effective for every student. In a classroom containing many learners, teachers often have limited time to address individual difficulties. Some students understand complicated subjects quickly, while others require repeated explanations and additional exercises.`
 },
-    { title: 'English Passage 3', text: 'Discipline is essential for success in life. It teaches us to follow rules, respect others and use our time wisely. A disciplined person can achieve goals through regular effort.' },
+    {
+  title: 'English Passage 3',
+  text: ` When lessons follow a fixed schedule, those who fall behind may struggle to understand subsequent topics. Students who require greater academic challenges may also become less interested when instruction moves at a slower pace. 
+Digital learning tools can help address some of these difficulties by offering recorded explanations, interactive exercises and additional educational materials.
+The availability of online resources has also changed the way students conduct academic research. Previously, research often required access to physical libraries, specialised books and printed journals. These resources remain important, but digital libraries now allow students to explore a much wider range of academic materials. 
+They can examine scientific studies, compare historical interpretations and consult publications from international institutions. Such opportunities can strengthen independent learning and encourage students to investigate subjects beyond the limits of their prescribed textbooks.
+Nevertheless, having access to information does not necessarily mean possessing knowledge. The internet contains accurate academic research alongside misleading claims, incomplete explanations and fabricated information. 
+Students who cannot evaluate the reliability of online materials may develop incorrect understandings of important subjects. Therefore, digital education must include the development of critical thinking and research skills. 
+Learners should understand how to identify original sources, compare different accounts and distinguish evidence-based conclusions from unsupported opinions. These abilities are becoming increasingly important in a world where information spreads rapidly through social media and other digital platforms.
+Artificial intelligence is introducing another significant change to the educational environment. Intelligent computer systems can explain complicated concepts, generate practice exercises, assist with language learning and help students organise academic information. 
+They can also support teachers by preparing educational materials, developing classroom activities and identifying common learning difficulties. Such applications may become particularly useful in institutions where teachers have limited time or access to specialised resources.`
+},
+
     { title: 'English Passage 4', text: 'Trees are very important for the environment. They provide oxygen, fruits, wood and shelter for birds and animals. We should plant more trees and protect forests for future generations.' },
     { title: 'English Passage 5', text: 'Time is one of the most valuable resources in our lives. Once lost, it never comes back. Therefore, we should make proper plans and use every moment wisely.' },
     { title: 'English Passage 6', text: 'Reading books is a good habit that improves our knowledge and imagination. Books introduce us to different cultures, ideas and experiences. Regular reading also improves our language skills.' },
