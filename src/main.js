@@ -895,6 +895,29 @@ $('customPracticeBtn').addEventListener('click', () => {
 
 });
 
+// ================= RESET BUTTON =================
+
+$('resetBtn').addEventListener('click', resetTest);
+
+
+// ================= END BUTTON =================
+
+const endButton = $('endBtn');
+
+if (endButton) {
+
+  endButton.addEventListener('click', () => {
+
+    if (!started || finished) {
+      return;
+    }
+
+    finishTest();
+
+  });
+
+}
+
 
 // ================= INITIALIZE WEBSITE =================
 
@@ -903,18 +926,3 @@ loadPassages();
 resetTest();
 
 renderDashboard();
-// ================= RESET BUTTON =================
-
-$('resetBtn').addEventListener(
-  'click',
-  resetTest
-);
-// ================= END BUTTON =================
-
-$('endBtn').addEventListener('click', () => {
-
-  if (!started || finished) return;
-
-  finishTest();
-
-});
