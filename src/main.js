@@ -23,7 +23,26 @@ This transformation has created a new understanding of education. Learning is no
 
 The increasing availability of digital resources has also encouraged individuals to take greater responsibility for their own learning. Nevertheless, technological progress has brought complicated questions about educational quality, equal access, academic honesty and the changing responsibilities of teachers.`
 },
-    { title: 'English Passage 2', text: 'Technology has changed the way we live, work and communicate. Computers and the internet have made information available to everyone. Modern technology saves time and makes many tasks easier.' },
+   {
+  title: 'English Passage 2',
+  text: `The challenge is not simply to introduce more technology into classrooms but to ensure that technological development contributes to meaningful learning and the intellectual development of students.
+
+In Bangladesh, the transformation is particularly significant because education is closely connected with the country's economic and social future.
+
+A large proportion of the population consists of young people who will eventually become part of the national workforce. Their ability to compete in an increasingly technology-driven global economy will depend considerably on the quality of education they receive.
+
+Although the country has made progress in expanding educational opportunities, substantial differences remain between urban and rural institutions, wealthy and disadvantaged families, and students with different levels of technological access.
+
+The introduction of digital education could help address some of these differences, but only if the necessary infrastructure, training and financial support are provided.
+
+The traditional classroom has served as the foundation of formal education for generations. Teachers explained lessons, students followed textbooks, examinations measured academic performance and educational institutions provided an organised environment for intellectual development.
+
+This arrangement helped establish discipline and created opportunities for students to interact with their peers. Classroom discussions, group assignments and direct communication with teachers also encouraged cooperation and social development.
+
+Even today, these characteristics remain valuable because education involves much more than the transfer of information. Students must learn how to communicate, respect different opinions, work with others and become responsible members of society.
+
+However, traditional educational methods have not always been equally effective for every student. In a classroom containing many learners, teachers often have limited time to address individual difficulties. Some students understand complicated subjects quickly, while others require repeated explanations and additional exercises.`
+}
     { title: 'English Passage 3', text: 'Discipline is essential for success in life. It teaches us to follow rules, respect others and use our time wisely. A disciplined person can achieve goals through regular effort.' },
     { title: 'English Passage 4', text: 'Trees are very important for the environment. They provide oxygen, fruits, wood and shelter for birds and animals. We should plant more trees and protect forests for future generations.' },
     { title: 'English Passage 5', text: 'Time is one of the most valuable resources in our lives. Once lost, it never comes back. Therefore, we should make proper plans and use every moment wisely.' },
