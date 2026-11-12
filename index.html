@@ -428,6 +428,108 @@
       color: #94a3b8;
     }
 
+    /* ================= SIDE DRAWER (My Passages) ================= */
+
+    #passageManagerBtn {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      z-index: 90;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(420px, 100%);
+      background: #fff;
+      color: #1e293b;
+      box-shadow: -8px 0 30px rgba(0, 0, 0, 0.2);
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform 0.3s, visibility 0.3s;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+      visibility: visible;
+    }
+
+    body.dark .drawer {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    body.dark .drawer-header {
+      border-bottom-color: #334155;
+    }
+
+    .drawer-header h3 {
+      margin: 0;
+    }
+
+    .drawer-close {
+      background: transparent;
+      color: inherit;
+      padding: 6px 12px;
+      font-size: 1.1rem;
+    }
+
+    .drawer-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .drawer-body h4 {
+      margin: 0 0 10px;
+    }
+
+    .drawer-body input,
+    .drawer-body textarea {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .drawer-body textarea {
+      height: 220px;
+    }
+
+    .drawer-body hr {
+      border: 0;
+      border-top: 1px solid #94a3b8;
+      opacity: 0.3;
+      margin: 22px 0;
+    }
+
+    #deletePassageBtn {
+      margin-bottom: 0;
+    }
+
     footer {
       text-align: center;
       padding: 30px 0 10px;
@@ -582,11 +684,6 @@
             <option value="bn">বাংলা Typing</option>
           </select>
 
-          <select id="layout">
-            <option value="qwerty">QWERTY</option>
-            <option value="bijoy">Bijoy Classic</option>
-          </select>
-
           <select id="duration">
             <option value="2">2 Minutes</option>
             <option value="5" selected>5 Minutes</option>
@@ -605,39 +702,13 @@
             Customize Practice
           </button>
 
+          <button type="button" id="passageManagerBtn">
+            📁 My Passages
+          </button>
+
         </div>
 
         <div id="normalPassageSection">
-
-          <div class="add-passage">
-
-            <h3>Add Your Own Passage</h3>
-
-            <button id="deletePassageBtn">
-              Delete Current Passage
-            </button>
-
-            <br />
-
-            <input
-              id="passageTitle"
-              type="text"
-              placeholder="Passage Name"
-              style="margin-bottom: 10px; width: 100%"
-            />
-
-            <br />
-
-            <textarea
-              id="newPassage"
-              placeholder="এখানে তোমার নিজের বড় বাংলা অথবা ইংরেজি লেখা লিখো..."
-            ></textarea>
-
-            <button id="savePassage">Save Passage</button>
-
-            <p id="saveMessage" style="color: green"></p>
-
-          </div>
 
           <div id="passage" class="passage"></div>
 
@@ -788,6 +859,54 @@
     <footer>© 2026 TypingBD | Practice Makes Perfect</footer>
 
   </div>
+
+  <!-- ================= পাশের ফোল্ডার: My Passages ================= -->
+
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+
+  <aside id="passageDrawer" class="drawer" aria-hidden="true">
+
+    <div class="drawer-header">
+      <h3>📁 My Passages</h3>
+      <button type="button" id="closeDrawerBtn" class="drawer-close" aria-label="বন্ধ করুন">✕</button>
+    </div>
+
+    <div class="drawer-body">
+
+      <h4>নতুন প্যাসেজ যোগ করুন</h4>
+
+      <p class="result-note" style="margin: 0 0 12px">
+        ভাষা: <strong id="drawerLang">English</strong> (এই ভাষার তালিকায় যোগ হবে)
+      </p>
+
+      <input
+        id="passageTitle"
+        type="text"
+        placeholder="প্যাসেজের নাম"
+      />
+
+      <textarea
+        id="newPassage"
+        placeholder="এখানে আপনার নিজের বড় বাংলা অথবা ইংরেজি লেখা লিখুন..."
+      ></textarea>
+
+      <button type="button" id="savePassage">Save Passage</button>
+
+      <p id="saveMessage" style="color: #16a34a; font-weight: 600"></p>
+
+      <hr />
+
+      <h4>বর্তমান প্যাসেজ</h4>
+
+      <p id="currentPassageName" style="font-weight: 600; margin: 0 0 4px">—</p>
+
+      <p id="deleteHint" class="result-note" style="margin: 0 0 12px"></p>
+
+      <button type="button" id="deletePassageBtn">Delete Current Passage</button>
+
+    </div>
+
+  </aside>
 
   <script type="module" src="/src/main.js"></script>
 </body>
