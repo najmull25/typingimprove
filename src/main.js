@@ -424,30 +424,84 @@ function renderDashboard() {
 
   renderChart(history);
 
-  if ($('historyList')) {
-    $('historyList').innerHTML = history.length
-      ? history
-          .map((h) => {
-            const parts = String(h.date).split(', ');
+  renderHistory();
+}
 
-            const datePart = parts[0] || h.date;
+// ================= HISTORY (প্রতিদিনের সর্বোচ্চ গতি) =================
 
-            const timePart = parts[1] || '';
+function getDayKey(date = new Date()) {
+  const y = date.getFullYear();
 
-            return `
-              <div class="history-item">
-                <span style="color: #3b82f6; width: 25%; text-align: left;">📅 ${datePart}</span>
-                <span style="color: #64748b; width: 25%; text-align: left;">⏰ ${timePart}</span>
-                <span style="color: #10b981; font-weight: bold; width: 25%; text-align: left;">⚡ ${h.wpm} WPM</span>
-                <span style="color: #f43f5e; font-weight: bold; width: 25%; text-align: left;">🎯 ${h.accuracy}</span>
-              </div>
-            `;
-          })
-          .join(
-            '<hr style="border: 0; border-top: 1px solid #94a3b8; opacity: 0.3; margin: 0;">'
-          )
+  const mo = String(date.getMonth() + 1).padStart(2, '0');
+
+  const d = String(date.getDate()).padStart(2, '0');
+
+  return `${y}-${mo}-${d}`;
+}
+
+function formatDay(key) {
+  const [y, mo, d] = key.split('-').map(Number);
+
+  return new Date(y, mo - 1, d).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function renderHistory() {
+  const box = $('historyList');
+
+  if (!box) return;
+
+  const daily = loadJSON('dailyBest', {});
+
+  const days = Object.keys(daily).sort().reverse();
+
+  if (!days.length) {
+    box.textContent = loadJSON('history', []).length
+      ? 'এখন থেকে ইংরেজি ও বাংলা গতি আলাদাভাবে সেভ হচ্ছে। নতুন টেস্ট দিলে এখানে প্রতিদিনের সর্বোচ্চ গতি দেখা যাবে।'
       : 'এখনো কোনো পরীক্ষা সম্পন্ন হয়নি।';
+
+    return;
   }
+
+  const gridStyle =
+    'display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: center; padding: 12px 10px;';
+
+  const speed = (value, color) =>
+    value > 0
+      ? `<span style="color: ${color}; font-weight: bold;">⚡ ${value} WPM</span>`
+      : '<span style="opacity: 0.5;">—</span>';
+
+  const divider =
+    '<hr style="border: 0; border-top: 1px solid #94a3b8; opacity: 0.3; margin: 0;">';
+
+  const today = getDayKey();
+
+  const head = `
+    <div style="${gridStyle} font-weight: bold; opacity: 0.8;">
+      <span>📅 তারিখ</span>
+      <span>English সর্বোচ্চ</span>
+      <span>বাংলা সর্বোচ্চ</span>
+    </div>
+  `;
+
+  const rows = days
+    .map(
+      (day) => `
+        <div style="${gridStyle}">
+          <span style="color: #3b82f6; font-weight: 500;">${formatDay(day)}${
+            day === today ? ' (আজ)' : ''
+          }</span>
+          ${speed(daily[day].en, '#10b981')}
+          ${speed(daily[day].bn, '#f59e0b')}
+        </div>
+      `
+    )
+    .join(divider);
+
+  box.innerHTML = head + divider + rows;
 }
 
 // ================= FINISH TEST =================
@@ -513,9 +567,36 @@ function finishTest() {
     mistakes: $('errors').textContent,
 
     mode: isCustomMode ? 'Custom' : 'Normal',
+
+    lang: $('language').value,
   });
 
   saveJSON('history', history.slice(0, 20));
+
+  // প্রতিদিনের সর্বোচ্চ গতি (ইংরেজি ও বাংলা আলাদা)
+  if (wpm > 0) {
+    const daily = loadJSON('dailyBest', {});
+
+    const day = getDayKey();
+
+    const lang = $('language').value;
+
+    daily[day] = daily[day] || { en: 0, bn: 0 };
+
+    daily[day][lang] = Math.max(daily[day][lang] || 0, wpm);
+
+    const trimmed = {};
+
+    Object.keys(daily)
+      .sort()
+      .reverse()
+      .slice(0, 365)
+      .forEach((k) => {
+        trimmed[k] = daily[k];
+      });
+
+    saveJSON('dailyBest', trimmed);
+  }
 
   renderDashboard();
 
