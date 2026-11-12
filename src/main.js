@@ -735,7 +735,9 @@ $('savePassage').addEventListener('click', () => {
 
   setTimeout(() => {
     $('saveMessage').textContent = '';
-  }, 2500);
+
+    closeDrawer();
+  }, 1200);
 });
 
 // ================= LANGUAGE / PASSAGE / DURATION CHANGE =================
@@ -762,10 +764,72 @@ $('endBtn').addEventListener('click', () => {
   finishTest();
 });
 
-// ================= ESC = RESET =================
+// ================= SIDE DRAWER (My Passages) =================
+
+const drawer = $('passageDrawer');
+
+const drawerOverlay = $('drawerOverlay');
+
+function updateDrawerInfo() {
+  const lang = $('language').value;
+
+  const idx = Number($('passageSelect').value);
+
+  const current = getLibrary(lang)[idx];
+
+  const isDefault = idx < defaultPassages[lang].length;
+
+  $('drawerLang').textContent = lang === 'bn' ? 'বাংলা' : 'English';
+
+  $('currentPassageName').textContent = current ? current.title : '—';
+
+  $('deletePassageBtn').disabled = isDefault;
+
+  $('deleteHint').textContent = isDefault
+    ? 'এটি ডিফল্ট প্যাসেজ, তাই ডিলিট করা যায় না।'
+    : 'এটি আপনার নিজের প্যাসেজ, ডিলিট করা যাবে।';
+}
+
+function openDrawer() {
+  updateDrawerInfo();
+
+  $('saveMessage').textContent = '';
+
+  drawer.classList.add('open');
+
+  drawerOverlay.classList.add('open');
+
+  drawer.setAttribute('aria-hidden', 'false');
+
+  setTimeout(() => $('passageTitle').focus(), 300);
+}
+
+function closeDrawer() {
+  drawer.classList.remove('open');
+
+  drawerOverlay.classList.remove('open');
+
+  drawer.setAttribute('aria-hidden', 'true');
+}
+
+$('passageManagerBtn').addEventListener('click', openDrawer);
+
+$('closeDrawerBtn').addEventListener('click', closeDrawer);
+
+drawerOverlay.addEventListener('click', closeDrawer);
+
+// ================= ESC: ড্রয়ার খোলা থাকলে বন্ধ, নইলে টেস্ট রিসেট =================
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') resetTest();
+  if (e.key !== 'Escape') return;
+
+  if (drawer.classList.contains('open')) {
+    closeDrawer();
+
+    return;
+  }
+
+  resetTest();
 });
 
 // ================= DARK MODE =================
@@ -856,6 +920,8 @@ $('deletePassageBtn').addEventListener('click', () => {
     loadPassages();
 
     resetTest();
+
+    closeDrawer();
   }
 });
 
@@ -869,6 +935,10 @@ $('customPracticeBtn').addEventListener('click', () => {
 
     $('passageSelect').style.display = 'none';
 
+    $('passageManagerBtn').style.display = 'none';
+
+    closeDrawer();
+
     $('customPracticeBtn').textContent = 'Normal Practice';
 
     $('customPracticeBtn').classList.add('activeMode');
@@ -879,6 +949,8 @@ $('customPracticeBtn').addEventListener('click', () => {
     $('normalPassageSection').style.display = 'block';
 
     $('passageSelect').style.display = 'block';
+
+    $('passageManagerBtn').style.display = '';
 
     $('customPracticeBtn').textContent = 'Customize Practice';
 
