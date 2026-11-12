@@ -12,77 +12,11 @@
 
 <style>
 * { box-sizing: border-box; }
-:root { --bg:#eef3fb; --card:#fff; --text:#0f1e3d; --mute:#64748b; --line:#e3eaf5; --blue:#2563eb; --shadow:0 8px 24px rgba(37,99,235,.08); }
-body.dark { --bg:#0b1220; --card:#142036; --text:#f1f5f9; --mute:#94a3b8; --line:#243452; --shadow:0 8px 24px rgba(0,0,0,.3); }
-body { font-family:'Hind Siliguri','Segoe UI',Tahoma,Geneva,Verdana,sans-serif; margin:0; background:var(--bg); color:var(--text); transition:.3s; }
-
-/* ===== লেআউট ===== */
-.shell { display:grid; grid-template-columns:250px minmax(0,1fr); min-height:100vh; }
-.content { width:100%; max-width:1120px; margin:0 auto; padding:20px 28px; }
-.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-.hello { font-weight:700; font-size:1.15rem; }
-#themeBtn { background:var(--card); border:1px solid var(--line); border-radius:999px; color:var(--text); padding:8px 16px; }
+/* এই ফাইলে শুধু Practice / Dashboard / History পেজের স্টাইল আছে।
+   হোম পেজ, সাইডবার ও রং (--bg, --card...) আছে src/home/home.css-এ। */
+body { font-family:'Hind Siliguri','Segoe UI',Tahoma,Geneva,Verdana,sans-serif; margin:0; background:var(--bg,#f8fafc); color:var(--text,#1e293b); transition:.3s; }
 .page-section { display:none; }
 footer { text-align:center; padding:30px 0 10px; color:#64748b; }
-
-/* ===== সাইডবার ===== */
-.sidebar { position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:22px; padding:24px 16px; color:#fff; background:linear-gradient(180deg,#0b1a3d,#0f2a6b); }
-.brand { text-align:center; }
-.brand .logo { font-size:2.4rem; line-height:1; }
-.brand b { display:block; font-size:1.55rem; }
-.brand b span { color:#60a5fa; }
-.brand small { opacity:.75; }
-.side-nav { display:flex; flex-direction:column; gap:6px; }
-.side-nav a { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#cbd5e1; font-weight:600; text-decoration:none; transition:.2s; }
-.side-nav a:hover { background:rgba(255,255,255,.08); color:#fff; }
-.side-nav a.active { background:linear-gradient(90deg,#2563eb,#1d4ed8); color:#fff; box-shadow:0 6px 16px rgba(37,99,235,.45); }
-.trophy { margin-top:auto; display:grid; gap:4px; text-align:center; padding:18px 12px; border-radius:16px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); }
-.trophy div { font-size:2.4rem; }
-.trophy b { color:#fbbf24; }
-.trophy small { opacity:.8; }
-
-/* ===== হোম ===== */
-.hero { display:grid; grid-template-columns:1.1fr .9fr; align-items:center; gap:20px; padding:34px 36px; border-radius:24px; overflow:hidden; box-shadow:var(--shadow); background:linear-gradient(120deg,#dbeafe,#eff6ff 55%,#bfdbfe); color:#0f1e3d; }
-body.dark .hero { background:linear-gradient(120deg,#12264d,#1b3a7a 60%,#1e40af); color:#fff; }
-.hero h1 { margin:0; font-size:2.3rem; line-height:1.15; }
-.hero h1 em { display:block; font-size:3.3rem; font-weight:800; letter-spacing:-1px; background:linear-gradient(90deg,#1d4ed8,#3b82f6); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-body.dark .hero h1 em { background:linear-gradient(90deg,#93c5fd,#fff); -webkit-background-clip:text; background-clip:text; }
-.hero p { margin:12px 0 22px; color:#334155; }
-body.dark .hero p { color:#cbd5e1; }
-#goToPracticeBtn { border-radius:999px; padding:14px 30px; background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 8px 20px rgba(37,99,235,.4); }
-.laptop { justify-self:center; perspective:900px; }
-.screen { width:260px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; border:6px solid #1e293b; border-radius:12px 12px 4px 4px; background:linear-gradient(135deg,#0b1a3d,#1e40af); color:#fff; font-weight:700; font-size:1.15rem; text-align:center; transform:rotateY(-16deg) rotateX(4deg); box-shadow:0 22px 40px rgba(15,30,61,.35); }
-.screen i { width:90px; height:3px; border-radius:3px; background:#fbbf24; }
-.base { width:300px; height:12px; margin:0 auto; border-radius:0 0 14px 14px; background:linear-gradient(#cbd5e1,#94a3b8); transform:rotateY(-16deg) translateX(-8px); }
-.stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin:18px 0; }
-.stat { display:flex; align-items:center; gap:14px; padding:16px; border-radius:18px; background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow); }
-.ico { flex:none; width:48px; height:48px; border-radius:50%; display:grid; place-items:center; font-size:1.4rem; }
-.c1 { background:#dbeafe; } .c2 { background:#dcfce7; } .c3 { background:#ede9fe; } .c4 { background:#fef3c7; }
-.stat span { display:block; color:var(--mute); font-size:.9rem; }
-.stat b { font-size:1.7rem; }
-.hp-grid { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:16px; }
-.hp-side { display:grid; gap:16px; align-content:start; }
-.hp-card { padding:20px; border-radius:20px; background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow); }
-.hp-card h3 { margin:0; }
-.hp-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
-.hp-tabs { display:flex; gap:6px; }
-.hp-tabs button { padding:6px 16px; border-radius:999px; font-size:.9rem; background:var(--bg); color:var(--mute); }
-.hp-tabs button.on { background:var(--blue); color:#fff; }
-.hp-demo { min-height:120px; padding:18px; border-radius:14px; border:1px solid var(--line); background:var(--bg); font-size:1.4rem; line-height:1.8; }
-#hpTyped { color:#16a34a; }
-#hpRest { color:var(--mute); }
-.caret { display:inline-block; width:2px; height:1.2em; vertical-align:text-bottom; background:var(--blue); animation:blink 1s steps(1) infinite; }
-@keyframes blink { 50% { opacity:0; } }
-.hp-bar { height:10px; margin-top:14px; border-radius:99px; overflow:hidden; background:var(--line); }
-.hp-bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#2563eb,#60a5fa); }
-.hp-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:18px; }
-.hp-actions button { border-radius:999px; padding:12px 26px; }
-.btn-main { padding:14px 36px !important; background:linear-gradient(135deg,#2563eb,#1d4ed8); box-shadow:0 8px 20px rgba(37,99,235,.4); }
-.btn-soft { background:var(--card); color:var(--text); border:1px solid var(--line) !important; }
-.tips { margin:12px 0 0; padding:0; list-style:none; display:grid; gap:10px; }
-.tips li::before { content:"✔"; display:inline-grid; place-items:center; width:20px; height:20px; margin-right:8px; border-radius:50%; background:#22c55e; color:#fff; font-size:.7rem; }
-.quote { text-align:center; background:linear-gradient(160deg,#ede9fe,#dbeafe); color:#1e1b4b; }
-body.dark .quote { background:linear-gradient(160deg,#2e2566,#1e3a8a); color:#fff; }
 
 /* ===== প্র্যাকটিস ===== */
 .controls { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
@@ -140,17 +74,7 @@ body.dark .drawer-header { border-bottom-color:#334155; }
 .drawer-body textarea { height:320px; }
 
 /* ===== মোবাইল ===== */
-@media (max-width:900px) { .hp-grid { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:720px) {
-  .shell { grid-template-columns:1fr; }
-  .sidebar { position:static; height:auto; gap:10px; padding:12px; }
-  .trophy, .brand small, .brand .logo { display:none; }
-  .side-nav { flex-direction:row; overflow-x:auto; }
-  .side-nav a { padding:10px 12px; white-space:nowrap; }
-  .content { padding:14px; }
-  .hero { grid-template-columns:1fr; padding:24px; }
-  .hero h1 em { font-size:2.6rem; }
-  .laptop { display:none; }
   .passage, #typingInput { height:220px; min-height:220px; max-height:220px; font-size:1.1rem; }
   .result-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .result-card { padding:16px 8px; }
@@ -185,61 +109,8 @@ body.dark .drawer-header { border-bottom-color:#334155; }
 
     <main>
 
-      <!-- ১. হোম -->
-      <section class="page-section" id="homePage" style="display: block">
-        <div class="hero">
-          <div>
-            <h1>Improve Your <em>Typing Speed</em></h1>
-            <p>বাংলা ও ইংরেজি টাইপিং অনুশীলন করুন। প্রতিদিন একটু একটু করে এগিয়ে যান।</p>
-            <button id="goToPracticeBtn">▶ টাইপিং প্র্যাকটিস শুরু করুন</button>
-          </div>
-          <div class="laptop" aria-hidden="true">
-            <div class="screen">Typing<br />Makes You Better<i></i></div>
-            <div class="base"></div>
-          </div>
-        </div>
-
-        <div class="stats">
-          <div class="stat"><div class="ico c1">🏆</div><div><span>সর্বোচ্চ WPM</span><b id="hpBest">0</b></div></div>
-          <div class="stat"><div class="ico c2">🎯</div><div><span>সর্বশেষ WPM</span><b id="hpLast">0</b></div></div>
-          <div class="stat"><div class="ico c3">⚡</div><div><span>আজকের টেস্ট</span><b id="hpToday">0</b></div></div>
-          <div class="stat"><div class="ico c4">📈</div><div><span>মোট টেস্ট</span><b id="hpTotal">0</b></div></div>
-        </div>
-
-        <div class="hp-grid">
-          <div class="hp-card">
-            <div class="hp-head">
-              <h3>⌨ লাইভ ডেমো</h3>
-              <div class="hp-tabs">
-                <button type="button" class="on" data-lang="en">English</button>
-                <button type="button" data-lang="bn">বাংলা</button>
-              </div>
-            </div>
-            <div class="hp-demo"><span id="hpTyped"></span><span class="caret"></span><span id="hpRest"></span></div>
-            <div class="hp-bar"><i id="hpProgress"></i></div>
-            <div class="hp-actions">
-              <button type="button" class="btn-main" id="hpStartBtn">▶ Start Typing</button>
-              <button type="button" class="btn-soft" id="hpResultsBtn">📊 View Results</button>
-            </div>
-          </div>
-
-          <div class="hp-side">
-            <div class="hp-card">
-              <h3>💡 টাইপিং টিপস</h3>
-              <ul class="tips">
-                <li>সব আঙুল ব্যবহার করুন</li>
-                <li>ছন্দ ধরে রাখুন</li>
-                <li>কিবোর্ডের দিকে তাকাবেন না</li>
-                <li>প্রতিদিন অনুশীলন করুন</li>
-              </ul>
-            </div>
-            <div class="hp-card quote">
-              <p style="margin: 0 0 6px">“ছোট ছোট পদক্ষেপই প্রতিদিন বড় উন্নতি আনে।”</p>
-              <b>এগিয়ে চলুন!</b>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- ১. হোম: ভেতরের সব কিছু src/home/home.html থেকে আসে -->
+      <section class="page-section" id="homePage" style="display: block"></section>
 
       <!-- ২. প্র্যাকটিস -->
       <section class="page-section" id="practicePage">
@@ -339,67 +210,8 @@ body.dark .drawer-header { border-bottom-color:#334155; }
   </div>
 </aside>
 
+<!-- জরুরি: home.js অবশ্যই main.js-এর আগে থাকতে হবে -->
+<script type="module" src="/src/home/home.js"></script>
 <script type="module" src="/src/main.js"></script>
-
-<!-- হোম পেজের স্ক্রিপ্ট (আলাদা ফাইল লাগে না) -->
-<script type="module">
-const $ = (id) => document.getElementById(id);
-const load = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch { return f; } };
-
-function dayKey(d = new Date()) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function refreshHomeStats() {
-  const history = load('history', []);
-  const today = load('dailyStats', {})[dayKey()] || {};
-  $('hpBest').textContent = localStorage.getItem('bestWpm') || 0;
-  $('hpLast').textContent = history[0]?.wpm ?? 0;
-  $('hpToday').textContent = (today.en?.count || 0) + (today.bn?.count || 0);
-  $('hpTotal').textContent = localStorage.getItem('totalTests') || 0;
-}
-
-const demo = {
-  en: 'Practice makes perfect. Keep typing and you will be faster than before.',
-  bn: 'অনুশীলনই সফলতার চাবিকাঠি। প্রতিদিন একটু একটু করে টাইপ করুন।',
-};
-const split = (t) => typeof Intl.Segmenter === 'function'
-  ? Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(t), (s) => s.segment)
-  : Array.from(t);
-
-let chars = split(demo.en), step = 0, timer = null;
-
-function paint(n) {
-  $('hpTyped').textContent = chars.slice(0, n).join('');
-  $('hpRest').textContent = chars.slice(n).join('');
-  $('hpProgress').style.width = (n / chars.length) * 100 + '%';
-}
-
-function startDemo(lang) {
-  clearInterval(timer);
-  chars = split(demo[lang]);
-  step = 0;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return paint(chars.length);
-  timer = setInterval(() => {
-    if ($('homePage').style.display === 'none') return;
-    step = step > chars.length + 10 ? 0 : step + 1;
-    paint(Math.min(step, chars.length));
-  }, 110);
-}
-
-document.querySelectorAll('.hp-tabs button').forEach((btn) =>
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.hp-tabs button').forEach((b) => b.classList.toggle('on', b === btn));
-    startDemo(btn.dataset.lang);
-  })
-);
-
-$('hpStartBtn').addEventListener('click', () => $('navPractice').click());
-$('hpResultsBtn').addEventListener('click', () => $('navDashboard').click());
-$('navHome').addEventListener('click', refreshHomeStats);
-
-refreshHomeStats();
-startDemo('en');
-</script>
 </body>
 </html>
