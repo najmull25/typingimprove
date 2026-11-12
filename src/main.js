@@ -23,49 +23,9 @@ function saveJSON(key, value) {
 
 // ================= PASSAGE LIBRARY =================
 // ডিফল্ট প্যাসেজ থাকে passages.js ফাইলে।
-// ব্যবহারকারীর নিজের প্যাসেজ আলাদাভাবে "customPassages" নামে সেভ হয়।
-
-function loadCustomPassages() {
-  const stored = loadJSON('customPassages', null);
-
-  if (stored && Array.isArray(stored.en) && Array.isArray(stored.bn)) {
-    return stored;
-  }
-
-  // পুরোনো সংস্করণ (passageLibrary) থেকে নিজের প্যাসেজগুলো উদ্ধার করা
-  const old = loadJSON('passageLibrary', null);
-  const migrated = { en: [], bn: [] };
-
-  if (old) {
-    const defaultTitles = new Set(
-      [...defaultPassages.en, ...defaultPassages.bn].map((p) => p.title)
-    );
-
-    ['en', 'bn'].forEach((lang) => {
-      if (!Array.isArray(old[lang])) return;
-
-      const defaults = defaultPassages[lang];
-
-      const hasNewDefaults = defaults.every(
-        (p, i) =>
-          old[lang][i]?.title === p.title && old[lang][i]?.text === p.text
-      );
-
-      migrated[lang] = old[lang]
-        .slice(hasNewDefaults ? defaults.length : 2)
-        .filter((p) => p && p.title && !defaultTitles.has(p.title));
-    });
-  }
-
-  saveJSON('customPassages', migrated);
-
-  return migrated;
-}
-
-let customPassages = loadCustomPassages();
 
 function getLibrary(lang) {
-  return [...defaultPassages[lang], ...customPassages[lang]];
+  return defaultPassages[lang];
 }
 
 // ================= STATE =================
@@ -78,15 +38,19 @@ let finished = false;
 let startTime = 0;
 let isCustomMode = false;
 
+// My Passages থেকে দেওয়া সাময়িক লেখা (সেভ হয় না, রিলোড দিলে মুছে যায়)
+let tempPassage = '';
+
 // ================= CURRENT PASSAGE =================
 
 function getCurrentPassage() {
   if (isCustomMode) return '';
 
-  return (
-    getLibrary($('language').value)[Number($('passageSelect').value)]?.text ||
-    ''
-  );
+  const value = $('passageSelect').value;
+
+  if (value === 'temp') return tempPassage;
+
+  return getLibrary($('language').value)[Number(value)]?.text || '';
 }
 
 // ================= HELPERS =================
@@ -196,6 +160,15 @@ function loadPassages() {
 
     select.appendChild(opt);
   });
+
+  if (tempPassage) {
+    const opt = document.createElement('option');
+
+    opt.value = 'temp';
+    opt.textContent = '✏️ আমার লেখা (সাময়িক)';
+
+    select.appendChild(opt);
+  }
 
   showPassage();
 }
@@ -853,47 +826,35 @@ typingBox.addEventListener('input', () => {
 typingBox.addEventListener('paste', (e) => e.preventDefault());
 typingBox.addEventListener('drop', (e) => e.preventDefault());
 
-// ================= SAVE PASSAGE =================
+// ================= USE MY OWN TEXT (সাময়িক, সেভ হয় না) =================
 
-$('savePassage').addEventListener('click', () => {
-  const title = $('passageTitle').value.trim();
+$('usePassageBtn').addEventListener('click', () => {
+  const text = $('newPassage').value.trim();
 
-  const text = $('newPassage').value;
-
-  const lang = $('language').value;
-
-  if (!title || !text.trim()) {
-    alert('Passage Title এবং Text লিখুন!');
+  if (!text) {
+    $('saveMessage').textContent = 'আগে ঘরে লেখা দিন।';
 
     return;
   }
 
-  customPassages[lang].push({ title, text });
-
-  saveJSON('customPassages', customPassages);
+  tempPassage = text;
 
   loadPassages();
 
-  $('passageSelect').value = getLibrary(lang).length - 1;
-
-  $('passageTitle').value = '';
-
-  $('newPassage').value = '';
+  $('passageSelect').value = 'temp';
 
   resetTest();
 
-  $('saveMessage').textContent = 'Passage Successfully Saved!';
+  closeDrawer();
 
-  setTimeout(() => {
-    $('saveMessage').textContent = '';
-
-    closeDrawer();
-  }, 1200);
+  setTimeout(() => $('typingInput').focus(), 350);
 });
 
 // ================= LANGUAGE / PASSAGE / DURATION CHANGE =================
 
 $('language').addEventListener('change', () => {
+  tempPassage = '';
+
   loadPassages();
 
   resetTest();
@@ -921,29 +882,7 @@ const drawer = $('passageDrawer');
 
 const drawerOverlay = $('drawerOverlay');
 
-function updateDrawerInfo() {
-  const lang = $('language').value;
-
-  const idx = Number($('passageSelect').value);
-
-  const current = getLibrary(lang)[idx];
-
-  const isDefault = idx < defaultPassages[lang].length;
-
-  $('drawerLang').textContent = lang === 'bn' ? 'বাংলা' : 'English';
-
-  $('currentPassageName').textContent = current ? current.title : '—';
-
-  $('deletePassageBtn').disabled = isDefault;
-
-  $('deleteHint').textContent = isDefault
-    ? 'এটি ডিফল্ট প্যাসেজ, তাই ডিলিট করা যায় না।'
-    : 'এটি আপনার নিজের প্যাসেজ, ডিলিট করা যাবে।';
-}
-
 function openDrawer() {
-  updateDrawerInfo();
-
   $('saveMessage').textContent = '';
 
   drawer.classList.add('open');
@@ -952,7 +891,7 @@ function openDrawer() {
 
   drawer.setAttribute('aria-hidden', 'false');
 
-  setTimeout(() => $('passageTitle').focus(), 300);
+  setTimeout(() => $('newPassage').focus(), 300);
 }
 
 function closeDrawer() {
@@ -1047,33 +986,6 @@ Object.keys(navs).forEach((k) =>
 
 $('goToPracticeBtn').addEventListener('click', () => {
   showSection('practice');
-});
-
-// ================= DELETE PASSAGE =================
-
-$('deletePassageBtn').addEventListener('click', () => {
-  const idx = Number($('passageSelect').value);
-
-  const lang = $('language').value;
-
-  const defaultCount = defaultPassages[lang].length;
-
-  // ডিফল্ট প্যাসেজ ডিলিট করা যায় না
-  if (idx < defaultCount) {
-    return alert('ডিফল্ট প্যাসেজ ডিলিট করা সম্ভব নয়!');
-  }
-
-  if (confirm('ডিলিট করবেন?')) {
-    customPassages[lang].splice(idx - defaultCount, 1);
-
-    saveJSON('customPassages', customPassages);
-
-    loadPassages();
-
-    resetTest();
-
-    closeDrawer();
-  }
 });
 
 // ================= CUSTOM PRACTICE MODE =================
