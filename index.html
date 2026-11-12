@@ -359,11 +359,6 @@
       background: #64748b;
     }
 
-    #deletePassageBtn {
-      background: #ef4444;
-      margin-bottom: 10px;
-    }
-
     .add-passage {
       background: rgba(59, 130, 246, 0.05);
       padding: 20px;
@@ -516,7 +511,7 @@
     }
 
     .drawer-body textarea {
-      height: 220px;
+      height: 320px;
     }
 
     .drawer-body hr {
@@ -524,10 +519,6 @@
       border-top: 1px solid #94a3b8;
       opacity: 0.3;
       margin: 22px 0;
-    }
-
-    #deletePassageBtn {
-      margin-bottom: 0;
     }
 
     footer {
@@ -873,36 +864,24 @@
 
     <div class="drawer-body">
 
-      <h4>নতুন প্যাসেজ যোগ করুন</h4>
+      <h4>নিজের লেখা দিয়ে প্র্যাকটিস</h4>
 
       <p class="result-note" style="margin: 0 0 12px">
-        ভাষা: <strong id="drawerLang">English</strong> (এই ভাষার তালিকায় যোগ হবে)
+        এখানে লেখা সেভ হয় না। শুধু এখনকার প্র্যাকটিসের জন্য ব্যবহার হবে, পেজ রিলোড করলে মুছে যাবে।
       </p>
-
-      <input
-        id="passageTitle"
-        type="text"
-        placeholder="প্যাসেজের নাম"
-      />
 
       <textarea
         id="newPassage"
-        placeholder="এখানে আপনার নিজের বড় বাংলা অথবা ইংরেজি লেখা লিখুন..."
+        placeholder="এখানে আপনার নিজের বাংলা অথবা ইংরেজি লেখা লিখুন বা পেস্ট করুন..."
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
       ></textarea>
 
-      <button type="button" id="savePassage">Save Passage</button>
+      <button type="button" id="usePassageBtn">এই লেখা দিয়ে প্র্যাকটিস করুন</button>
 
-      <p id="saveMessage" style="color: #16a34a; font-weight: 600"></p>
-
-      <hr />
-
-      <h4>বর্তমান প্যাসেজ</h4>
-
-      <p id="currentPassageName" style="font-weight: 600; margin: 0 0 4px">—</p>
-
-      <p id="deleteHint" class="result-note" style="margin: 0 0 12px"></p>
-
-      <button type="button" id="deletePassageBtn">Delete Current Passage</button>
+      <p id="saveMessage" style="color: #dc2626; font-weight: 600"></p>
 
     </div>
 
