@@ -1,680 +1,255 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="TypingBD - বাংলা ও ইংরেজি টাইপিং অনুশীলন করুন সহজেই। লাইভ WPM, Accuracy ও প্রোগ্রেস গ্রাফ সহ।" />
-  <title>TypingBD - Typing Practice</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨</text></svg>" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Hind Siliguri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f8fafc;
-      color: #1e293b;
-      transition: 0.3s;
-    }
-
-    body.dark {
-      background: #0f172a;
-      color: #f8fafc;
-    }
-
-    .app {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    body.dark header {
-      border-bottom-color: #334155;
-    }
-
-    nav {
-      display: flex;
-      gap: 15px;
-      margin: 20px 0;
-      background: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    body.dark nav {
-      background: #1e293b;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #64748b;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: 0.2s;
-    }
-
-    nav a:hover,
-    nav a.active {
-      color: #3b82f6;
-      background: rgba(59, 130, 246, 0.1);
-    }
-
-    body.dark nav a {
-      color: #94a3b8;
-    }
-
-    body.dark nav a.active,
-    body.dark nav a:hover {
-      color: #60a5fa;
-    }
-
-    .page-section {
-      display: none;
-    }
-
-    /* ================= HOME ================= */
-
-    .hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-      color: #ffffff;
-      min-height: 60vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      border-radius: 16px;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-    }
-
-    .hero p {
-      color: #94a3b8;
-      font-size: 1.1rem;
-      margin-bottom: 30px;
-    }
-
-    .workspace-visual {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 25px;
-      border-radius: 20px;
-      margin-bottom: 25px;
-    }
-
-    #goToPracticeBtn {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      border: none;
-      padding: 14px 35px;
-      font-size: 1.1rem;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-      transition: 0.2s;
-    }
-
-    #goToPracticeBtn:hover {
-      transform: translateY(-2px);
-    }
-
-    /* ================= PRACTICE ================= */
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    select,
-    input,
-    textarea {
-      padding: 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-family: inherit;
-      background: #fff;
-      color: #1e293b;
-    }
-
-    body.dark select,
-    body.dark input,
-    body.dark textarea {
-      background: #1e293b;
-      border-color: #334155;
-      color: #f8fafc;
-    }
-
-    textarea {
-      width: 100%;
-      height: 120px;
-      resize: vertical;
-      margin-bottom: 15px;
-    }
-
-    /* Passage Box */
-
-    .passage {
-      position: relative; /* highlight স্ক্রলের জন্য জরুরি */
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      border-left: 5px solid #3b82f6;
-      font-family: 'Hind Siliguri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.325rem;
-      line-height: 1.9;
-      height: 260px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
-      word-break: normal;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    body.dark .passage {
-      background: #1e293b;
-    }
-
-    /* লাইভ রং: সবুজ = ঠিক, লাল = ভুল, নীল = বর্তমান অক্ষর */
-    .passage span.ok {
-      color: #16a34a;
-    }
-
-    .passage span.bad {
-      color: #dc2626;
-      background: rgba(220, 38, 38, 0.2);
-      border-radius: 3px;
-    }
-
-    .passage span.cur {
-      background: rgba(59, 130, 246, 0.35);
-      border-radius: 3px;
-    }
-
-    body.dark .passage span.ok {
-      color: #4ade80;
-    }
-
-    body.dark .passage span.bad {
-      color: #f87171;
-    }
-
-    /* Typing Box */
-
-    #typingInput {
-      display: block;
-      width: 100%;
-      height: 260px;
-      min-height: 260px;
-      max-height: 260px;
-      padding: 20px;
-      margin-bottom: 15px;
-      font-family: 'Hind Siliguri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.325rem;
-      line-height: 1.9;
-      border: 0;
-      border-left: 5px solid transparent;
-      border-radius: 8px;
-      resize: none;
-      overflow-y: auto;
-      overflow-x: hidden;
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
-      word-break: normal;
-    }
-
-    #typingInput:focus {
-      outline: 2px solid #3b82f6;
-    }
-
-    body.dark #typingInput {
-      background: #1e293b;
-      color: #f8fafc;
-    }
-
-    .timer {
-      font-size: 2rem;
-      font-weight: bold;
-      text-align: center;
-      margin: 20px 0 5px;
-      color: #ef4444;
-    }
-
-    .live-stats {
-      text-align: center;
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: #64748b;
-      margin-bottom: 15px;
-    }
-
-    body.dark .live-stats {
-      color: #94a3b8;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    /* ================= RESULT ================= */
-
-    .result-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .result-card {
-      background: #fff;
-      padding: 20px 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      text-align: center;
-      min-width: 0;
-    }
-
-    body.dark .result-card {
-      background: #1e293b;
-    }
-
-    .result-card span {
-      display: block;
-      font-size: 0.9rem;
-      color: #64748b;
-      line-height: 1.5;
-    }
-
-    .result-card h3 {
-      margin: 10px 0 0 0;
-      font-size: 1.8rem;
-      overflow-wrap: anywhere;
-    }
-
-    /* ================= BUTTONS ================= */
-
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      font-family: inherit;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      border: none;
-      background: #3b82f6;
-      color: white;
-      transition: 0.2s;
-    }
-
-    button:hover:not(:disabled) {
-      filter: brightness(1.1);
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #endBtn {
-      background: #f59e0b;
-    }
-
-    #resetBtn {
-      background: #64748b;
-    }
-
-    .add-passage {
-      background: rgba(59, 130, 246, 0.05);
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-
-    #themeBtn {
-      background: transparent;
-      border: 1px solid #cbd5e1;
-      color: inherit;
-      padding: 6px 12px;
-    }
-
-    body.dark #themeBtn {
-      border-color: #334155;
-    }
-
-    .history-box {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    body.dark .history-box {
-      background: #1e293b;
-    }
-
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 10px;
-      font-size: 1rem;
-      font-weight: 500;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    #customPracticeBtn {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
-      transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
-    }
-
-    #customPracticeBtn.activeMode {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
-    }
-
-    .result-note {
-      color: #64748b;
-      font-size: 0.85rem;
-      margin-top: 12px;
-      line-height: 1.6;
-    }
-
-    body.dark .result-note {
-      color: #94a3b8;
-    }
-
-    /* ================= SIDE DRAWER (My Passages) ================= */
-
-    #passageManagerBtn {
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    }
-
-    .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s;
-      z-index: 90;
-    }
-
-    .drawer-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100%;
-      width: min(420px, 100%);
-      background: #fff;
-      color: #1e293b;
-      box-shadow: -8px 0 30px rgba(0, 0, 0, 0.2);
-      transform: translateX(100%);
-      visibility: hidden;
-      transition: transform 0.3s, visibility 0.3s;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .drawer.open {
-      transform: translateX(0);
-      visibility: visible;
-    }
-
-    body.dark .drawer {
-      background: #1e293b;
-      color: #f8fafc;
-    }
-
-    .drawer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 20px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    body.dark .drawer-header {
-      border-bottom-color: #334155;
-    }
-
-    .drawer-header h3 {
-      margin: 0;
-    }
-
-    .drawer-close {
-      background: transparent;
-      color: inherit;
-      padding: 6px 12px;
-      font-size: 1.1rem;
-    }
-
-    .drawer-body {
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .drawer-body h4 {
-      margin: 0 0 10px;
-    }
-
-    .drawer-body input,
-    .drawer-body textarea {
-      width: 100%;
-      margin-bottom: 12px;
-    }
-
-    .drawer-body textarea {
-      height: 320px;
-    }
-
-    .drawer-body hr {
-      border: 0;
-      border-top: 1px solid #94a3b8;
-      opacity: 0.3;
-      margin: 22px 0;
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px 0 10px;
-      color: #64748b;
-    }
-
-    @media (max-width: 600px) {
-      .app {
-        padding: 12px;
-      }
-
-      nav {
-        gap: 5px;
-        padding: 8px;
-        flex-wrap: wrap;
-      }
-
-      nav a {
-        padding: 6px 8px;
-      }
-
-      .hero h1 {
-        font-size: 2rem;
-      }
-
-      .passage,
-      #typingInput {
-        height: 220px;
-        min-height: 220px;
-        max-height: 220px;
-        font-size: 1.1rem;
-      }
-
-      .result-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-      }
-
-      .result-card {
-        padding: 16px 8px;
-      }
-
-      .result-card span {
-        font-size: 0.82rem;
-      }
-
-      .result-card h3 {
-        font-size: 1.5rem;
-      }
-
-      .history-item {
-        font-size: 0.85rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="TypingBD - বাংলা ও ইংরেজি টাইপিং অনুশীলন করুন সহজেই। লাইভ WPM, Accuracy ও প্রোগ্রেস গ্রাফ সহ।" />
+<title>TypingBD - Typing Practice</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+* { box-sizing: border-box; }
+:root { --bg:#eef3fb; --card:#fff; --text:#0f1e3d; --mute:#64748b; --line:#e3eaf5; --blue:#2563eb; --shadow:0 8px 24px rgba(37,99,235,.08); }
+body.dark { --bg:#0b1220; --card:#142036; --text:#f1f5f9; --mute:#94a3b8; --line:#243452; --shadow:0 8px 24px rgba(0,0,0,.3); }
+body { font-family:'Hind Siliguri','Segoe UI',Tahoma,Geneva,Verdana,sans-serif; margin:0; background:var(--bg); color:var(--text); transition:.3s; }
+
+/* ===== লেআউট ===== */
+.shell { display:grid; grid-template-columns:250px minmax(0,1fr); min-height:100vh; }
+.content { width:100%; max-width:1120px; margin:0 auto; padding:20px 28px; }
+.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.hello { font-weight:700; font-size:1.15rem; }
+#themeBtn { background:var(--card); border:1px solid var(--line); border-radius:999px; color:var(--text); padding:8px 16px; }
+.page-section { display:none; }
+footer { text-align:center; padding:30px 0 10px; color:#64748b; }
+
+/* ===== সাইডবার ===== */
+.sidebar { position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:22px; padding:24px 16px; color:#fff; background:linear-gradient(180deg,#0b1a3d,#0f2a6b); }
+.brand { text-align:center; }
+.brand .logo { font-size:2.4rem; line-height:1; }
+.brand b { display:block; font-size:1.55rem; }
+.brand b span { color:#60a5fa; }
+.brand small { opacity:.75; }
+.side-nav { display:flex; flex-direction:column; gap:6px; }
+.side-nav a { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#cbd5e1; font-weight:600; text-decoration:none; transition:.2s; }
+.side-nav a:hover { background:rgba(255,255,255,.08); color:#fff; }
+.side-nav a.active { background:linear-gradient(90deg,#2563eb,#1d4ed8); color:#fff; box-shadow:0 6px 16px rgba(37,99,235,.45); }
+.trophy { margin-top:auto; display:grid; gap:4px; text-align:center; padding:18px 12px; border-radius:16px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); }
+.trophy div { font-size:2.4rem; }
+.trophy b { color:#fbbf24; }
+.trophy small { opacity:.8; }
+
+/* ===== হোম ===== */
+.hero { display:grid; grid-template-columns:1.1fr .9fr; align-items:center; gap:20px; padding:34px 36px; border-radius:24px; overflow:hidden; box-shadow:var(--shadow); background:linear-gradient(120deg,#dbeafe,#eff6ff 55%,#bfdbfe); color:#0f1e3d; }
+body.dark .hero { background:linear-gradient(120deg,#12264d,#1b3a7a 60%,#1e40af); color:#fff; }
+.hero h1 { margin:0; font-size:2.3rem; line-height:1.15; }
+.hero h1 em { display:block; font-size:3.3rem; font-weight:800; letter-spacing:-1px; background:linear-gradient(90deg,#1d4ed8,#3b82f6); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+body.dark .hero h1 em { background:linear-gradient(90deg,#93c5fd,#fff); -webkit-background-clip:text; background-clip:text; }
+.hero p { margin:12px 0 22px; color:#334155; }
+body.dark .hero p { color:#cbd5e1; }
+#goToPracticeBtn { border-radius:999px; padding:14px 30px; background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 8px 20px rgba(37,99,235,.4); }
+.laptop { justify-self:center; perspective:900px; }
+.screen { width:260px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; border:6px solid #1e293b; border-radius:12px 12px 4px 4px; background:linear-gradient(135deg,#0b1a3d,#1e40af); color:#fff; font-weight:700; font-size:1.15rem; text-align:center; transform:rotateY(-16deg) rotateX(4deg); box-shadow:0 22px 40px rgba(15,30,61,.35); }
+.screen i { width:90px; height:3px; border-radius:3px; background:#fbbf24; }
+.base { width:300px; height:12px; margin:0 auto; border-radius:0 0 14px 14px; background:linear-gradient(#cbd5e1,#94a3b8); transform:rotateY(-16deg) translateX(-8px); }
+.stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin:18px 0; }
+.stat { display:flex; align-items:center; gap:14px; padding:16px; border-radius:18px; background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow); }
+.ico { flex:none; width:48px; height:48px; border-radius:50%; display:grid; place-items:center; font-size:1.4rem; }
+.c1 { background:#dbeafe; } .c2 { background:#dcfce7; } .c3 { background:#ede9fe; } .c4 { background:#fef3c7; }
+.stat span { display:block; color:var(--mute); font-size:.9rem; }
+.stat b { font-size:1.7rem; }
+.hp-grid { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:16px; }
+.hp-side { display:grid; gap:16px; align-content:start; }
+.hp-card { padding:20px; border-radius:20px; background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow); }
+.hp-card h3 { margin:0; }
+.hp-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.hp-tabs { display:flex; gap:6px; }
+.hp-tabs button { padding:6px 16px; border-radius:999px; font-size:.9rem; background:var(--bg); color:var(--mute); }
+.hp-tabs button.on { background:var(--blue); color:#fff; }
+.hp-demo { min-height:120px; padding:18px; border-radius:14px; border:1px solid var(--line); background:var(--bg); font-size:1.4rem; line-height:1.8; }
+#hpTyped { color:#16a34a; }
+#hpRest { color:var(--mute); }
+.caret { display:inline-block; width:2px; height:1.2em; vertical-align:text-bottom; background:var(--blue); animation:blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity:0; } }
+.hp-bar { height:10px; margin-top:14px; border-radius:99px; overflow:hidden; background:var(--line); }
+.hp-bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#2563eb,#60a5fa); }
+.hp-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:18px; }
+.hp-actions button { border-radius:999px; padding:12px 26px; }
+.btn-main { padding:14px 36px !important; background:linear-gradient(135deg,#2563eb,#1d4ed8); box-shadow:0 8px 20px rgba(37,99,235,.4); }
+.btn-soft { background:var(--card); color:var(--text); border:1px solid var(--line) !important; }
+.tips { margin:12px 0 0; padding:0; list-style:none; display:grid; gap:10px; }
+.tips li::before { content:"✔"; display:inline-grid; place-items:center; width:20px; height:20px; margin-right:8px; border-radius:50%; background:#22c55e; color:#fff; font-size:.7rem; }
+.quote { text-align:center; background:linear-gradient(160deg,#ede9fe,#dbeafe); color:#1e1b4b; }
+body.dark .quote { background:linear-gradient(160deg,#2e2566,#1e3a8a); color:#fff; }
+
+/* ===== প্র্যাকটিস ===== */
+.controls { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+select, input, textarea { padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size:1rem; font-family:inherit; background:#fff; color:#1e293b; }
+body.dark select, body.dark input, body.dark textarea { background:#1e293b; border-color:#334155; color:#f8fafc; }
+textarea { width:100%; height:120px; resize:vertical; margin-bottom:15px; }
+.passage { position:relative; background:#fff; padding:20px; border-radius:8px; border-left:5px solid #3b82f6; font-size:1.325rem; line-height:1.9; height:260px; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap; overflow-wrap:break-word; word-break:normal; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,.05); }
+body.dark .passage { background:#1e293b; }
+.passage span.ok { color:#16a34a; }
+.passage span.bad { color:#dc2626; background:rgba(220,38,38,.2); border-radius:3px; }
+.passage span.cur { background:rgba(59,130,246,.35); border-radius:3px; }
+body.dark .passage span.ok { color:#4ade80; }
+body.dark .passage span.bad { color:#f87171; }
+#typingInput { display:block; width:100%; height:260px; min-height:260px; max-height:260px; padding:20px; margin-bottom:15px; font-size:1.325rem; line-height:1.9; border:0; border-left:5px solid transparent; border-radius:8px; resize:none; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap; overflow-wrap:break-word; word-break:normal; }
+#typingInput:focus { outline:2px solid #3b82f6; }
+body.dark #typingInput { background:#1e293b; color:#f8fafc; }
+.timer { font-size:2rem; font-weight:bold; text-align:center; margin:20px 0 5px; color:#ef4444; }
+.live-stats { text-align:center; font-weight:600; font-size:1.1rem; color:#64748b; margin-bottom:15px; }
+body.dark .live-stats { color:#94a3b8; }
+.btn-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+
+/* ===== রেজাল্ট ও ড্যাশবোর্ড ===== */
+.result-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:15px; margin-top:20px; }
+.result-card { background:#fff; padding:20px 12px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.05); text-align:center; min-width:0; }
+body.dark .result-card { background:#1e293b; }
+.result-card span { display:block; font-size:.9rem; color:#64748b; line-height:1.5; }
+.result-card h3 { margin:10px 0 0; font-size:1.8rem; overflow-wrap:anywhere; }
+.result-note { color:#64748b; font-size:.85rem; margin-top:12px; line-height:1.6; }
+body.dark .result-note { color:#94a3b8; }
+.history-box { background:#fff; padding:15px; border-radius:8px; margin-top:15px; box-shadow:0 2px 4px rgba(0,0,0,.05); }
+body.dark .history-box { background:#1e293b; }
+
+/* ===== বাটন ===== */
+button { padding:10px 20px; font-size:1rem; font-family:inherit; font-weight:bold; border-radius:6px; cursor:pointer; border:none; background:#3b82f6; color:#fff; transition:.2s; }
+button:hover:not(:disabled) { filter:brightness(1.1); }
+button:disabled { opacity:.6; cursor:not-allowed; }
+#endBtn { background:#f59e0b; }
+#resetBtn { background:#64748b; }
+#customPracticeBtn { background:linear-gradient(135deg,#10b981,#059669); box-shadow:0 2px 8px rgba(16,185,129,.2); }
+#customPracticeBtn.activeMode { background:linear-gradient(135deg,#ef4444,#dc2626); box-shadow:0 2px 8px rgba(239,68,68,.2); }
+#passageManagerBtn { background:linear-gradient(135deg,#6366f1,#4f46e5); }
+
+/* ===== সাইড ড্রয়ার (My Passages) ===== */
+.drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .25s; z-index:90; }
+.drawer-overlay.open { opacity:1; pointer-events:auto; }
+.drawer { position:fixed; top:0; right:0; height:100%; width:min(420px,100%); background:#fff; color:#1e293b; box-shadow:-8px 0 30px rgba(0,0,0,.2); transform:translateX(100%); visibility:hidden; transition:transform .3s,visibility .3s; z-index:100; display:flex; flex-direction:column; }
+.drawer.open { transform:translateX(0); visibility:visible; }
+body.dark .drawer { background:#1e293b; color:#f8fafc; }
+.drawer-header { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid #e2e8f0; }
+body.dark .drawer-header { border-bottom-color:#334155; }
+.drawer-header h3 { margin:0; }
+.drawer-close { background:transparent; color:inherit; padding:6px 12px; font-size:1.1rem; }
+.drawer-body { padding:20px; overflow-y:auto; flex:1; }
+.drawer-body input, .drawer-body textarea { width:100%; margin-bottom:12px; }
+.drawer-body textarea { height:320px; }
+
+/* ===== মোবাইল ===== */
+@media (max-width:900px) { .hp-grid { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:720px) {
+  .shell { grid-template-columns:1fr; }
+  .sidebar { position:static; height:auto; gap:10px; padding:12px; }
+  .trophy, .brand small, .brand .logo { display:none; }
+  .side-nav { flex-direction:row; overflow-x:auto; }
+  .side-nav a { padding:10px 12px; white-space:nowrap; }
+  .content { padding:14px; }
+  .hero { grid-template-columns:1fr; padding:24px; }
+  .hero h1 em { font-size:2.6rem; }
+  .laptop { display:none; }
+  .passage, #typingInput { height:220px; min-height:220px; max-height:220px; font-size:1.1rem; }
+  .result-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .result-card { padding:16px 8px; }
+  .result-card h3 { font-size:1.5rem; }
+}
+</style>
 </head>
 
 <body>
-  <div class="app">
+<div class="shell">
 
-    <header>
-      <h2>⌨ TypingBD</h2>
-      <button id="themeBtn">🌙 Dark Mode</button>
-    </header>
-
-    <nav>
-      <a href="#" id="navHome" class="active">Home</a>
-      <a href="#" id="navPractice">Practice</a>
-      <a href="#" id="navDashboard">Dashboard</a>
-      <a href="#" id="navHistory">History</a>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">⌨</div>
+      <b>Typing<span>BD</span></b>
+      <small>Type • Learn • Improve</small>
+    </div>
+    <nav class="side-nav">
+      <a href="#" id="navHome" class="active"><span>🏠</span> Home</a>
+      <a href="#" id="navPractice"><span>⚡</span> Practice</a>
+      <a href="#" id="navDashboard"><span>📊</span> Dashboard</a>
+      <a href="#" id="navHistory"><span>🕘</span> History</a>
     </nav>
+    <div class="trophy"><div>🏆</div><b>You Can Do It!</b><small>Keep Practicing...</small></div>
+  </aside>
+
+  <div class="content">
+    <div class="topbar">
+      <div class="hello">স্বাগতম 👋</div>
+      <button id="themeBtn">🌙 Dark Mode</button>
+    </div>
 
     <main>
 
-      <!-- ================= ১. হোম পেজ ================= -->
-
+      <!-- ১. হোম -->
       <section class="page-section" id="homePage" style="display: block">
-
         <div class="hero">
-          <h1>Improve Your Typing Speed</h1>
-          <p>বাংলা ও ইংরেজি টাইপিং অনুশীলন করুন সহজেই।</p>
+          <div>
+            <h1>Improve Your <em>Typing Speed</em></h1>
+            <p>বাংলা ও ইংরেজি টাইপিং অনুশীলন করুন। প্রতিদিন একটু একটু করে এগিয়ে যান।</p>
+            <button id="goToPracticeBtn">▶ টাইপিং প্র্যাকটিস শুরু করুন</button>
+          </div>
+          <div class="laptop" aria-hidden="true">
+            <div class="screen">Typing<br />Makes You Better<i></i></div>
+            <div class="base"></div>
+          </div>
+        </div>
 
-          <div class="workspace-visual">
+        <div class="stats">
+          <div class="stat"><div class="ico c1">🏆</div><div><span>সর্বোচ্চ WPM</span><b id="hpBest">0</b></div></div>
+          <div class="stat"><div class="ico c2">🎯</div><div><span>সর্বশেষ WPM</span><b id="hpLast">0</b></div></div>
+          <div class="stat"><div class="ico c3">⚡</div><div><span>আজকের টেস্ট</span><b id="hpToday">0</b></div></div>
+          <div class="stat"><div class="ico c4">📈</div><div><span>মোট টেস্ট</span><b id="hpTotal">0</b></div></div>
+        </div>
 
-            <div style="
-              width: 300px;
-              max-width: 100%;
-              height: 170px;
-              background: #090d16;
-              border: 4px solid #334155;
-              border-radius: 12px;
-              margin: 0 auto;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
-              position: relative;
-              overflow: hidden;
-            ">
-
-              <div style="
-                width: 90%;
-                height: 85%;
-                color: #38bdf8;
-                font-family: 'Courier New', monospace;
-                padding: 10px;
-                text-align: left;
-                font-size: 12px;
-                line-height: 1.6;
-              ">
-                <span style="color: #f43f5e">$</span> typing-test --start<br />
-                <span style="color: #10b981">&gt; System: Ready...</span><br />
-                <span style="color: #e2e8f0">&gt; Start practicing now!</span>
+        <div class="hp-grid">
+          <div class="hp-card">
+            <div class="hp-head">
+              <h3>⌨ লাইভ ডেমো</h3>
+              <div class="hp-tabs">
+                <button type="button" class="on" data-lang="en">English</button>
+                <button type="button" data-lang="bn">বাংলা</button>
               </div>
-
             </div>
-
-            <div style="
-              width: 24px;
-              height: 25px;
-              background: #334155;
-              margin: 0 auto;
-            "></div>
-
-            <div style="
-              width: 90px;
-              height: 6px;
-              background: #475569;
-              margin: 0 auto;
-              border-radius: 3px 3px 0 0;
-            "></div>
-
+            <div class="hp-demo"><span id="hpTyped"></span><span class="caret"></span><span id="hpRest"></span></div>
+            <div class="hp-bar"><i id="hpProgress"></i></div>
+            <div class="hp-actions">
+              <button type="button" class="btn-main" id="hpStartBtn">▶ Start Typing</button>
+              <button type="button" class="btn-soft" id="hpResultsBtn">📊 View Results</button>
+            </div>
           </div>
 
-          <button id="goToPracticeBtn">
-            টাইপিং প্র্যাকটিস শুরু করুন
-          </button>
-
+          <div class="hp-side">
+            <div class="hp-card">
+              <h3>💡 টাইপিং টিপস</h3>
+              <ul class="tips">
+                <li>সব আঙুল ব্যবহার করুন</li>
+                <li>ছন্দ ধরে রাখুন</li>
+                <li>কিবোর্ডের দিকে তাকাবেন না</li>
+                <li>প্রতিদিন অনুশীলন করুন</li>
+              </ul>
+            </div>
+            <div class="hp-card quote">
+              <p style="margin: 0 0 6px">“ছোট ছোট পদক্ষেপই প্রতিদিন বড় উন্নতি আনে।”</p>
+              <b>এগিয়ে চলুন!</b>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- ================= ২. প্র্যাকটিস পেজ ================= -->
-
+      <!-- ২. প্র্যাকটিস -->
       <section class="page-section" id="practicePage">
-
         <h2>Typing Practice</h2>
 
         <div class="controls">
-
           <select id="language">
             <option value="en">English Typing</option>
             <option value="bn">বাংলা Typing</option>
           </select>
-
           <select id="duration">
             <option value="2">2 Minutes</option>
             <option value="5" selected>5 Minutes</option>
@@ -684,38 +259,16 @@
             <option value="25">25 Minutes</option>
             <option value="30">30 Minutes</option>
           </select>
-
-          <select id="passageSelect">
-            <option value="0">Passage 1</option>
-          </select>
-
-          <button id="customPracticeBtn">
-            Customize Practice
-          </button>
-
-          <button type="button" id="passageManagerBtn">
-            📁 My Passages
-          </button>
-
+          <select id="passageSelect"><option value="0">Passage 1</option></select>
+          <button id="customPracticeBtn">Customize Practice</button>
+          <button type="button" id="passageManagerBtn">📁 My Passages</button>
         </div>
 
-        <div id="normalPassageSection">
+        <div id="normalPassageSection"><div id="passage" class="passage"></div></div>
 
-          <div id="passage" class="passage"></div>
-
-        </div>
-
-        <textarea
-          id="typingInput"
-          placeholder="এখানে টাইপ করা শুরু করুন... (প্রথম অক্ষর টাইপ করলেই টাইমার চালু হবে)"
-          spellcheck="false"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-        ></textarea>
+        <textarea id="typingInput" placeholder="এখানে টাইপ করা শুরু করুন... (প্রথম অক্ষর টাইপ করলেই টাইমার চালু হবে)" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
 
         <div class="timer" id="timer">05:00</div>
-
         <div class="live-stats" id="liveStats">WPM: 0 | Accuracy: 100%</div>
 
         <div class="btn-row">
@@ -724,169 +277,129 @@
           <button type="button" id="resetBtn">Reset</button>
         </div>
 
-        <p class="result-note" style="text-align: center">
-          টিপস: Esc চাপলে টেস্ট রিসেট হবে। কপি-পেস্ট বন্ধ আছে।
-        </p>
-
-        <!-- ================= RESULT SECTION ================= -->
+        <p class="result-note" style="text-align: center">টিপস: Esc চাপলে টেস্ট রিসেট হবে। কপি-পেস্ট বন্ধ আছে।</p>
 
         <div class="result-panel" style="margin-top: 30px">
-
           <h2>Typing Test Result</h2>
-
           <div class="result-grid">
-
-            <div class="result-card">
-              <span>WPM (With Space)</span>
-              <h3 id="wpmWithSpace">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>WPM (Without Space)</span>
-              <h3 id="wpmWithoutSpace">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Word-based WPM</span>
-              <h3 id="wordWpm">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Accuracy</span>
-              <h3 id="accuracy">100%</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Total Typed Words</span>
-              <h3 id="totalTypedWords">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Correct Words</span>
-              <h3 id="correctWords">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Characters (With Space)</span>
-              <h3 id="charactersWithSpace">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Characters (Without Space)</span>
-              <h3 id="charactersWithoutSpace">0</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Duration</span>
-              <h3 id="resultDuration">N/A</h3>
-            </div>
-
-            <div class="result-card">
-              <span>Total Mistakes</span>
-              <h3 id="errors">0</h3>
-            </div>
-
+            <div class="result-card"><span>WPM (With Space)</span><h3 id="wpmWithSpace">0</h3></div>
+            <div class="result-card"><span>WPM (Without Space)</span><h3 id="wpmWithoutSpace">0</h3></div>
+            <div class="result-card"><span>Word-based WPM</span><h3 id="wordWpm">0</h3></div>
+            <div class="result-card"><span>Accuracy</span><h3 id="accuracy">100%</h3></div>
+            <div class="result-card"><span>Total Typed Words</span><h3 id="totalTypedWords">0</h3></div>
+            <div class="result-card"><span>Correct Words</span><h3 id="correctWords">0</h3></div>
+            <div class="result-card"><span>Characters (With Space)</span><h3 id="charactersWithSpace">0</h3></div>
+            <div class="result-card"><span>Characters (Without Space)</span><h3 id="charactersWithoutSpace">0</h3></div>
+            <div class="result-card"><span>Duration</span><h3 id="resultDuration">N/A</h3></div>
+            <div class="result-card"><span>Total Mistakes</span><h3 id="errors">0</h3></div>
           </div>
-
-          <p class="result-note">
-            Note: Custom Practice-এ Passage না থাকায় Accuracy,
-            Correct Words এবং Mistakes নির্ণয় করা সম্ভব নয়।
-          </p>
-
+          <p class="result-note">Note: Custom Practice-এ Passage না থাকায় Accuracy, Correct Words এবং Mistakes নির্ণয় করা সম্ভব নয়।</p>
         </div>
-
       </section>
 
-      <!-- ================= ৩. ড্যাশবোর্ড ================= -->
-
+      <!-- ৩. ড্যাশবোর্ড -->
       <section class="page-section" id="dashboardPage">
-
         <h2>Your Dashboard</h2>
-
         <div class="result-grid">
-
-          <div class="result-card" style="border-top: 4px solid #28a745">
-            <span>Best WPM (সর্বোচ্চ গতি)</span>
-            <h3 id="bestWpm" style="color: #28a745">0</h3>
-          </div>
-
-          <div class="result-card" style="border-top: 4px solid #dc3545">
-            <span>Lowest WPM (সর্বনিম্ন গতি)</span>
-            <h3 id="lowestWpm" style="color: #dc3545">0</h3>
-          </div>
-
-          <div class="result-card" style="border-top: 4px solid #ffc107">
-            <span>Today's Tests (আজকের প্র্যাকটিস)</span>
-            <h3 id="todayTests" style="color: #ffc107">0</h3>
-          </div>
-
-          <div class="result-card" style="border-top: 4px solid #007bff">
-            <span>Total Tests (সর্বমোট পরীক্ষা)</span>
-            <h3 id="totalTests" style="color: #007bff">0</h3>
-          </div>
-
+          <div class="result-card" style="border-top: 4px solid #28a745"><span>Best WPM (সর্বোচ্চ গতি)</span><h3 id="bestWpm" style="color: #28a745">0</h3></div>
+          <div class="result-card" style="border-top: 4px solid #dc3545"><span>Lowest WPM (সর্বনিম্ন গতি)</span><h3 id="lowestWpm" style="color: #dc3545">0</h3></div>
+          <div class="result-card" style="border-top: 4px solid #ffc107"><span>Today's Tests (আজকের প্র্যাকটিস)</span><h3 id="todayTests" style="color: #ffc107">0</h3></div>
+          <div class="result-card" style="border-top: 4px solid #007bff"><span>Total Tests (সর্বমোট পরীক্ষা)</span><h3 id="totalTests" style="color: #007bff">0</h3></div>
         </div>
-
         <h3 style="margin-top: 30px">WPM Progress (শেষ ২০টি টেস্ট)</h3>
-
         <div id="wpmChart" class="result-card" style="margin-top: 10px"></div>
-
       </section>
 
-      <!-- ================= ৪. হিস্ট্রি ================= -->
-
+      <!-- ৪. হিস্ট্রি -->
       <section class="page-section" id="historyPage">
-
         <h2>Typing History</h2>
-
-        <div id="historyList" class="history-box">
-          এখনো কোনো পরীক্ষা সম্পন্ন হয়নি।
-        </div>
-
+        <div id="historyList" class="history-box">এখনো কোনো পরীক্ষা সম্পন্ন হয়নি।</div>
       </section>
 
     </main>
 
     <footer>© 2026 TypingBD | Practice Makes Perfect</footer>
-
   </div>
+</div>
 
-  <!-- ================= পাশের ফোল্ডার: My Passages ================= -->
+<!-- My Passages ড্রয়ার -->
+<div id="drawerOverlay" class="drawer-overlay"></div>
 
-  <div id="drawerOverlay" class="drawer-overlay"></div>
+<aside id="passageDrawer" class="drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <h3>📁 My Passages</h3>
+    <button type="button" id="closeDrawerBtn" class="drawer-close" aria-label="বন্ধ করুন">✕</button>
+  </div>
+  <div class="drawer-body">
+    <h4>নিজের লেখা দিয়ে প্র্যাকটিস</h4>
+    <p class="result-note" style="margin: 0 0 12px">এখানে লেখা সেভ হয় না। শুধু এখনকার প্র্যাকটিসের জন্য ব্যবহার হবে, পেজ রিলোড করলে মুছে যাবে।</p>
+    <textarea id="newPassage" placeholder="এখানে আপনার নিজের বাংলা অথবা ইংরেজি লেখা লিখুন বা পেস্ট করুন..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    <button type="button" id="usePassageBtn">এই লেখা দিয়ে প্র্যাকটিস করুন</button>
+    <p id="saveMessage" style="color: #dc2626; font-weight: 600"></p>
+  </div>
+</aside>
 
-  <aside id="passageDrawer" class="drawer" aria-hidden="true">
+<script type="module" src="/src/main.js"></script>
 
-    <div class="drawer-header">
-      <h3>📁 My Passages</h3>
-      <button type="button" id="closeDrawerBtn" class="drawer-close" aria-label="বন্ধ করুন">✕</button>
-    </div>
+<!-- হোম পেজের স্ক্রিপ্ট (আলাদা ফাইল লাগে না) -->
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const load = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch { return f; } };
 
-    <div class="drawer-body">
+function dayKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
-      <h4>নিজের লেখা দিয়ে প্র্যাকটিস</h4>
+function refreshHomeStats() {
+  const history = load('history', []);
+  const today = load('dailyStats', {})[dayKey()] || {};
+  $('hpBest').textContent = localStorage.getItem('bestWpm') || 0;
+  $('hpLast').textContent = history[0]?.wpm ?? 0;
+  $('hpToday').textContent = (today.en?.count || 0) + (today.bn?.count || 0);
+  $('hpTotal').textContent = localStorage.getItem('totalTests') || 0;
+}
 
-      <p class="result-note" style="margin: 0 0 12px">
-        এখানে লেখা সেভ হয় না। শুধু এখনকার প্র্যাকটিসের জন্য ব্যবহার হবে, পেজ রিলোড করলে মুছে যাবে।
-      </p>
+const demo = {
+  en: 'Practice makes perfect. Keep typing and you will be faster than before.',
+  bn: 'অনুশীলনই সফলতার চাবিকাঠি। প্রতিদিন একটু একটু করে টাইপ করুন।',
+};
+const split = (t) => typeof Intl.Segmenter === 'function'
+  ? Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(t), (s) => s.segment)
+  : Array.from(t);
 
-      <textarea
-        id="newPassage"
-        placeholder="এখানে আপনার নিজের বাংলা অথবা ইংরেজি লেখা লিখুন বা পেস্ট করুন..."
-        spellcheck="false"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-      ></textarea>
+let chars = split(demo.en), step = 0, timer = null;
 
-      <button type="button" id="usePassageBtn">এই লেখা দিয়ে প্র্যাকটিস করুন</button>
+function paint(n) {
+  $('hpTyped').textContent = chars.slice(0, n).join('');
+  $('hpRest').textContent = chars.slice(n).join('');
+  $('hpProgress').style.width = (n / chars.length) * 100 + '%';
+}
 
-      <p id="saveMessage" style="color: #dc2626; font-weight: 600"></p>
+function startDemo(lang) {
+  clearInterval(timer);
+  chars = split(demo[lang]);
+  step = 0;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return paint(chars.length);
+  timer = setInterval(() => {
+    if ($('homePage').style.display === 'none') return;
+    step = step > chars.length + 10 ? 0 : step + 1;
+    paint(Math.min(step, chars.length));
+  }, 110);
+}
 
-    </div>
+document.querySelectorAll('.hp-tabs button').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hp-tabs button').forEach((b) => b.classList.toggle('on', b === btn));
+    startDemo(btn.dataset.lang);
+  })
+);
 
-  </aside>
+$('hpStartBtn').addEventListener('click', () => $('navPractice').click());
+$('hpResultsBtn').addEventListener('click', () => $('navDashboard').click());
+$('navHome').addEventListener('click', refreshHomeStats);
 
-  <script type="module" src="/src/main.js"></script>
+refreshHomeStats();
+startDemo('en');
+</script>
 </body>
 </html>
