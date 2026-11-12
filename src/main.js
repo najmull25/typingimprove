@@ -427,7 +427,7 @@ function renderDashboard() {
   renderHistory();
 }
 
-// ================= HISTORY (প্রতিদিনের সর্বোচ্চ গতি) =================
+// ================= HISTORY (প্রতিদিনের হিসাব ও গ্রাফ) =================
 
 function getDayKey(date = new Date()) {
   const y = date.getFullYear();
@@ -439,14 +439,160 @@ function getDayKey(date = new Date()) {
   return `${y}-${mo}-${d}`;
 }
 
-function formatDay(key) {
+function formatDay(key, withYear = true) {
   const [y, mo, d] = key.split('-').map(Number);
 
-  return new Date(y, mo - 1, d).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+  return new Date(y, mo - 1, d).toLocaleDateString(
+    'en-GB',
+    withYear
+      ? { day: 'numeric', month: 'short', year: 'numeric' }
+      : { day: 'numeric', month: 'short' }
+  );
+}
+
+// প্রতিদিনের হিসাব: { '2026-11-13': { en: {sum, count, best}, bn: {...} } }
+function loadDailyStats() {
+  const stored = loadJSON('dailyStats', null);
+
+  if (stored) return stored;
+
+  // আগের "dailyBest" (শুধু সর্বোচ্চ গতি) থেকে একবার রূপান্তর
+  const migrated = {};
+
+  const old = loadJSON('dailyBest', {});
+
+  Object.keys(old).forEach((day) => {
+    migrated[day] = {};
+
+    ['en', 'bn'].forEach((lang) => {
+      const v = old[day]?.[lang] || 0;
+
+      if (v > 0) migrated[day][lang] = { sum: v, count: 1, best: v };
+    });
   });
+
+  saveJSON('dailyStats', migrated);
+
+  return migrated;
+}
+
+function getLastDays(count) {
+  const list = [];
+
+  const now = new Date();
+
+  for (let i = count - 1; i >= 0; i--) {
+    list.push(
+      getDayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i))
+    );
+  }
+
+  return list;
+}
+
+function buildLangChart(title, lang, stats, days, color) {
+  const points = [];
+
+  let sum = 0;
+  let count = 0;
+  let best = 0;
+
+  days.forEach((day, i) => {
+    const s = stats[day]?.[lang];
+
+    if (!s || !s.count) return;
+
+    sum += s.sum;
+    count += s.count;
+    best = Math.max(best, s.best);
+
+    points.push({
+      i,
+      day,
+      avg: Math.round(s.sum / s.count),
+      best: s.best,
+      count: s.count,
+    });
+  });
+
+  const heading = `<h4 style="margin: 0 0 4px;">${title}</h4>`;
+
+  if (!points.length) {
+    return `
+      <div style="margin-bottom: 26px;">
+        ${heading}
+        <p class="result-note" style="margin: 4px 0 0;">গত ${days.length} দিনে কোনো টেস্ট দেওয়া হয়নি।</p>
+      </div>
+    `;
+  }
+
+  const W = 600;
+  const H = 210;
+  const PL = 38;
+  const PR = 14;
+  const PT = 14;
+  const PB = 28;
+
+  const max = Math.max(
+    10,
+    Math.ceil(Math.max(...points.map((p) => p.best)) / 10) * 10
+  );
+
+  const x = (i) => PL + (i / (days.length - 1)) * (W - PL - PR);
+  const y = (v) => H - PB - (v / max) * (H - PT - PB);
+
+  const line = (key) => points.map((p) => `${x(p.i)},${y(p[key])}`).join(' ');
+
+  const grid = [0, max / 2, max]
+    .map(
+      (v) => `
+        <line x1="${PL}" y1="${y(v)}" x2="${W - PR}" y2="${y(v)}" stroke="#94a3b8" stroke-opacity="0.35" stroke-width="1" />
+        <text x="${PL - 6}" y="${y(v) + 4}" text-anchor="end" font-size="12" fill="#94a3b8">${v}</text>
+      `
+    )
+    .join('');
+
+  const labelIndexes = [0, Math.floor((days.length - 1) / 2), days.length - 1];
+
+  const xLabels = labelIndexes
+    .map(
+      (i, k) =>
+        `<text x="${x(i)}" y="${H - 8}" text-anchor="${
+          k === 0 ? 'start' : k === 2 ? 'end' : 'middle'
+        }" font-size="12" fill="#94a3b8">${formatDay(days[i], false)}</text>`
+    )
+    .join('');
+
+  const dots = points
+    .map(
+      (p) =>
+        `<circle cx="${x(p.i)}" cy="${y(p.avg)}" r="4" fill="${color}"><title>${formatDay(
+          p.day
+        )}: গড় ${p.avg} WPM, সর্বোচ্চ ${p.best} WPM (${p.count}টি টেস্ট)</title></circle>`
+    )
+    .join('');
+
+  return `
+    <div style="margin-bottom: 26px;">
+      ${heading}
+      <p class="result-note" style="margin: 0 0 6px;">
+        গড়: <strong>${Math.round(sum / count)} WPM</strong> ·
+        সর্বোচ্চ: <strong>${best} WPM</strong> ·
+        মোট টেস্ট: <strong>${count}</strong>
+        &nbsp;|&nbsp;
+        <span style="color: ${color}; font-weight: 600;">● দৈনিক গড়</span>
+        &nbsp;
+        <span style="opacity: 0.8;">┄ দৈনিক সর্বোচ্চ</span>
+      </p>
+      <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto;" role="img" aria-label="${title}">
+        ${grid}
+        <polyline points="${line('best')}" fill="none" stroke="${color}" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round" />
+        <polyline points="${line('avg')}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" />
+        ${dots}
+        ${xLabels}
+      </svg>
+    </div>
+  `;
 }
 
 function renderHistory() {
@@ -454,54 +600,71 @@ function renderHistory() {
 
   if (!box) return;
 
-  const daily = loadJSON('dailyBest', {});
+  const stats = loadDailyStats();
 
-  const days = Object.keys(daily).sort().reverse();
+  const allDays = Object.keys(stats)
+    .filter((d) => stats[d] && (stats[d].en || stats[d].bn))
+    .sort()
+    .reverse();
 
-  if (!days.length) {
+  if (!allDays.length) {
     box.textContent = loadJSON('history', []).length
-      ? 'এখন থেকে ইংরেজি ও বাংলা গতি আলাদাভাবে সেভ হচ্ছে। নতুন টেস্ট দিলে এখানে প্রতিদিনের সর্বোচ্চ গতি দেখা যাবে।'
+      ? 'এখন থেকে ইংরেজি ও বাংলা গতি আলাদাভাবে সেভ হচ্ছে। নতুন টেস্ট দিলে এখানে প্রতিদিনের হিসাব ও গ্রাফ দেখা যাবে।'
       : 'এখনো কোনো পরীক্ষা সম্পন্ন হয়নি।';
 
     return;
   }
 
+  const last30 = getLastDays(30);
+
+  const charts =
+    buildLangChart('বাংলা টাইপিং (গত ৩০ দিন)', 'bn', stats, last30, '#f59e0b') +
+    buildLangChart('English Typing (গত ৩০ দিন)', 'en', stats, last30, '#10b981');
+
   const gridStyle =
     'display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: center; padding: 12px 10px;';
 
-  const speed = (value, color) =>
-    value > 0
-      ? `<span style="color: ${color}; font-weight: bold;">⚡ ${value} WPM</span>`
-      : '<span style="opacity: 0.5;">—</span>';
-
   const divider =
     '<hr style="border: 0; border-top: 1px solid #94a3b8; opacity: 0.3; margin: 0;">';
+
+  const cell = (s, color) =>
+    s && s.count
+      ? `<span><span style="color: ${color}; font-weight: bold;">⚡ ${s.best} WPM</span><br><small style="opacity: 0.7;">গড় ${Math.round(
+          s.sum / s.count
+        )} WPM</small></span>`
+      : '<span style="opacity: 0.5;">—</span>';
 
   const today = getDayKey();
 
   const head = `
     <div style="${gridStyle} font-weight: bold; opacity: 0.8;">
       <span>📅 তারিখ</span>
-      <span>English সর্বোচ্চ</span>
-      <span>বাংলা সর্বোচ্চ</span>
+      <span>English (সর্বোচ্চ / গড়)</span>
+      <span>বাংলা (সর্বোচ্চ / গড়)</span>
     </div>
   `;
 
-  const rows = days
+  const rows = allDays
+    .slice(0, 60)
     .map(
       (day) => `
         <div style="${gridStyle}">
           <span style="color: #3b82f6; font-weight: 500;">${formatDay(day)}${
             day === today ? ' (আজ)' : ''
           }</span>
-          ${speed(daily[day].en, '#10b981')}
-          ${speed(daily[day].bn, '#f59e0b')}
+          ${cell(stats[day].en, '#10b981')}
+          ${cell(stats[day].bn, '#f59e0b')}
         </div>
       `
     )
     .join(divider);
 
-  box.innerHTML = head + divider + rows;
+  box.innerHTML =
+    charts +
+    '<h4 style="margin: 0 0 6px;">প্রতিদিনের হিসাব</h4>' +
+    head +
+    divider +
+    rows;
 }
 
 // ================= FINISH TEST =================
@@ -573,29 +736,35 @@ function finishTest() {
 
   saveJSON('history', history.slice(0, 20));
 
-  // প্রতিদিনের সর্বোচ্চ গতি (ইংরেজি ও বাংলা আলাদা)
+  // প্রতিদিনের হিসাব: গড় ও সর্বোচ্চ গতি (ইংরেজি ও বাংলা আলাদা)
   if (wpm > 0) {
-    const daily = loadJSON('dailyBest', {});
+    const stats = loadDailyStats();
 
     const day = getDayKey();
 
     const lang = $('language').value;
 
-    daily[day] = daily[day] || { en: 0, bn: 0 };
+    stats[day] = stats[day] || {};
 
-    daily[day][lang] = Math.max(daily[day][lang] || 0, wpm);
+    const current = stats[day][lang] || { sum: 0, count: 0, best: 0 };
+
+    stats[day][lang] = {
+      sum: current.sum + wpm,
+      count: current.count + 1,
+      best: Math.max(current.best, wpm),
+    };
 
     const trimmed = {};
 
-    Object.keys(daily)
+    Object.keys(stats)
       .sort()
       .reverse()
       .slice(0, 365)
       .forEach((k) => {
-        trimmed[k] = daily[k];
+        trimmed[k] = stats[k];
       });
 
-    saveJSON('dailyBest', trimmed);
+    saveJSON('dailyStats', trimmed);
   }
 
   renderDashboard();
