@@ -16,7 +16,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 // ★★★ এখানে আপনার নিজের Gmail বসান। Firestore Rules-এও ঠিক একই ইমেইল দিতে হবে। ★★★
-const ADMIN_EMAIL = 'YOUR_EMAIL@gmail.com';
+const ADMIN_EMAIL = 'najmul0174.bd@gmail.com';
 
 const $ = (id) => document.getElementById(id);
 
