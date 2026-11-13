@@ -57,9 +57,17 @@ function getCurrentPassage() {
 
   const value = $('passageSelect').value;
 
-  if (value === 'temp') return normalizeBangla(tempPassage);
+  if (value === 'temp') return cleanPassage(tempPassage);
 
-  return normalizeBangla(getLibrary($('language').value)[Number(value)]?.text || '');
+  return cleanPassage(getLibrary($('language').value)[Number(value)]?.text || '');
+}
+
+// লাইনের শেষের বাড়তি স্পেস মুছে ফেলা হয়, যাতে স্পেস ছাড়াই সরাসরি এন্টার দিলে ঠিক ধরা হয়।
+function cleanPassage(text) {
+  return normalizeBangla(text)
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t\u00A0]+(?=\n)/g, '')
+    .trimEnd();
 }
 
 // ================= HELPERS =================
