@@ -136,7 +136,13 @@ function renderHighlight() {
       currentMarked = true;
     }
 
-    html += `<span class="${cls}">${escapeHTML(segment)}</span>`;
+    // এন্টার (নতুন লাইন) চোখে দেখা যায় না, তাই ↵ চিহ্ন দেখানো হয়।
+    // ভুল করে স্পেস দিলে এই চিহ্নটা লাল হবে।
+    const shown = segment.includes('\n')
+      ? '↵' + segment
+      : escapeHTML(segment);
+
+    html += `<span class="${cls}">${shown}</span>`;
 
     position += length;
   }
@@ -834,6 +840,20 @@ typingBox.addEventListener('input', () => {
 // কপি-পেস্ট বন্ধ, যাতে সঠিক গতি মাপা যায়
 typingBox.addEventListener('paste', (e) => e.preventDefault());
 typingBox.addEventListener('drop', (e) => e.preventDefault());
+
+// যেখানে প্যাসেজে এন্টার (নতুন লাইন) আছে, সেখানে স্পেস দিলে তা ঢুকবে না।
+// এন্টার না দিয়ে পরের শব্দে যাওয়া যাবে না।
+typingBox.addEventListener('beforeinput', (e) => {
+  if (isCustomMode || finished) return;
+
+  if (e.inputType !== 'insertText' || e.data !== ' ') return;
+
+  const typedLength = Array.from(normalizeBangla(typingBox.value)).length;
+
+  const expected = Array.from(getCurrentPassage())[typedLength];
+
+  if (expected === '\n') e.preventDefault();
+});
 
 // ================= USE MY OWN TEXT (সাময়িক, সেভ হয় না) =================
 
