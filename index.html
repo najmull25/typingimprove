@@ -59,6 +59,22 @@ button:disabled { opacity:.6; cursor:not-allowed; }
 #customPracticeBtn.activeMode { background:linear-gradient(135deg,#ef4444,#dc2626); box-shadow:0 2px 8px rgba(239,68,68,.2); }
 #passageManagerBtn { background:linear-gradient(135deg,#6366f1,#4f46e5); }
 
+/* ===== লগইন (Firebase) ===== */
+.topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.auth-box { display:flex; align-items:center; gap:8px; }
+.auth-box img { width:32px; height:32px; border-radius:50%; object-fit:cover; }
+#userName { font-weight:600; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#loginBtn { background:#fff; color:#1e293b; border:1px solid #cbd5e1; padding:8px 14px; }
+body.dark #loginBtn { background:#1e293b; color:#f8fafc; border-color:#334155; }
+#logoutBtn { background:#64748b; padding:8px 14px; }
+
+/* ===== লিডারবোর্ড ===== */
+.lb-table { width:100%; border-collapse:collapse; }
+.lb-table th, .lb-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e2e8f0; }
+body.dark .lb-table th, body.dark .lb-table td { border-bottom-color:#334155; }
+.lb-table th { color:#64748b; font-size:.9rem; }
+.lb-table tr.me { background:rgba(59,130,246,.12); font-weight:700; }
+
 /* ===== সাইড ড্রয়ার (My Passages) ===== */
 .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .25s; z-index:90; }
 .drawer-overlay.open { opacity:1; pointer-events:auto; }
@@ -79,6 +95,7 @@ body.dark .drawer-header { border-bottom-color:#334155; }
   .result-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .result-card { padding:16px 8px; }
   .result-card h3 { font-size:1.5rem; }
+  #userName { display:none; }
 }
 </style>
 </head>
@@ -97,6 +114,8 @@ body.dark .drawer-header { border-bottom-color:#334155; }
       <a href="#" id="navPractice"><span>⚡</span> Practice</a>
       <a href="#" id="navDashboard"><span>📊</span> Dashboard</a>
       <a href="#" id="navHistory"><span>🕘</span> History</a>
+      <!-- নতুন: লিডারবোর্ড -->
+      <a href="#" id="navLeaderboard"><span>🏅</span> Leaderboard</a>
     </nav>
     <div class="trophy"><div>🏆</div><b>You Can Do It!</b><small>Keep Practicing...</small></div>
   </aside>
@@ -104,7 +123,17 @@ body.dark .drawer-header { border-bottom-color:#334155; }
   <div class="content">
     <div class="topbar">
       <div class="hello">স্বাগতম 👋</div>
-      <button id="themeBtn">🌙 Dark Mode</button>
+
+      <div class="topbar-right">
+        <!-- নতুন: লগইন / লগআউট -->
+        <div class="auth-box">
+          <img id="userPhoto" alt="" style="display: none" />
+          <span id="userName"></span>
+          <button type="button" id="loginBtn">🔐 Google দিয়ে লগইন</button>
+          <button type="button" id="logoutBtn" style="display: none">লগআউট</button>
+        </div>
+        <button id="themeBtn">🌙 Dark Mode</button>
+      </div>
     </div>
 
     <main>
@@ -187,6 +216,13 @@ body.dark .drawer-header { border-bottom-color:#334155; }
         <div id="historyList" class="history-box">এখনো কোনো পরীক্ষা সম্পন্ন হয়নি।</div>
       </section>
 
+      <!-- ৫. নতুন: লিডারবোর্ড (ভেতরের তথ্য src/auth.js ভরে দেয়) -->
+      <section class="page-section" id="leaderboardPage">
+        <h2>🏅 Leaderboard</h2>
+        <p class="result-note">সেরা ২০ জনের সর্বোচ্চ WPM। তালিকায় নাম আসতে Google দিয়ে লগইন করে টেস্ট দিন।</p>
+        <div id="leaderboardBox" class="history-box">লোড হচ্ছে...</div>
+      </section>
+
     </main>
 
     <footer>© 2026 TypingBD | Practice Makes Perfect</footer>
@@ -210,8 +246,11 @@ body.dark .drawer-header { border-bottom-color:#334155; }
   </div>
 </aside>
 
-<!-- জরুরি: home.js অবশ্যই main.js-এর আগে থাকতে হবে -->
-<script type="module" src="/src/home/home.js"></script>
-<script type="module" src="/src/main.js"></script>
+<!-- জরুরি: home.js অবশ্যই main.js-এর আগে থাকতে হবে।
+     পাথের শুরুতে "/" ছিল, GitHub Pages-এ সেটা কাজ করে না, তাই "./" করা হয়েছে। -->
+<script type="module" src="./src/home/home.js"></script>
+<script type="module" src="./src/main.js"></script>
+<!-- নতুন: লগইন ও লিডারবোর্ড -->
+<script type="module" src="./src/auth.js"></script>
 </body>
 </html>
