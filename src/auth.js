@@ -315,13 +315,14 @@ async function loadAdmin() {
   box.textContent = 'লোড হচ্ছে...';
 
   try {
-    const snap = await getDocs(query(collection(db, 'members'), orderBy('createdAt', 'desc'), limit(500)));
+    const snap = await getDocs(query(collection(db, 'members'), limit(500)));
     if (snap.empty) { box.textContent = 'এখনো কেউ লগইন করেনি।'; return; }
 
     const rank = { pending: 0, rejected: 1, approved: 2 };
+    const time = (m) => (m.createdAt && m.createdAt.seconds) || 0;
     const members = snap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
-      .sort((a, b) => (rank[a.status] ?? 3) - (rank[b.status] ?? 3)); // Pending আগে
+      .sort((a, b) => (rank[a.status] ?? 3) - (rank[b.status] ?? 3) || time(b) - time(a)); // Pending আগে, নতুন আগে
 
     const frag = document.createDocumentFragment();
 
@@ -368,7 +369,7 @@ async function loadAdmin() {
     box.replaceChildren(frag);
   } catch (e) {
     console.error(e);
-    box.textContent = 'তালিকা লোড করা যায়নি। Firestore Rules-এ আপনার ইমেইল ঠিক আছে কি না দেখুন।';
+    box.textContent = 'তালিকা লোড করা যায়নি (' + (e.code || e.message) + '). Firestore Rules-এ আপনার ইমেইল ঠিক আছে কি না আর Publish হয়েছে কি না দেখুন।';
   }
 }
 
