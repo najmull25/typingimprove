@@ -1,19 +1,17 @@
 // =====================================================================
 //  প্যাসেজের মূল ফাইল (src/passages.js)
-//  main.js এই ফাইল থেকেই প্যাসেজ নেয়। এখানে তিনটি ফাইল জোড়া লাগানো হয়েছে:
+//  main.js এই ফাইল থেকেই প্যাসেজ নেয়।
 //
-//   passages-base.js    : আগের ২০টি করে প্যাসেজ (English ও বাংলা)
-//   passages-en-long.js : নতুন বড় ইংরেজি প্যাসেজ
-//   passages-bn-long.js : নতুন বড় বাংলা প্যাসেজ
+//  ইংরেজি : শুধু passages-en-long.js ফাইলের প্যাসেজ
+//  বাংলা  : শুধু passages-bn-long.js ফাইলের প্যাসেজ
 //
-//  এই ফাইলে কিছু বদলানোর দরকার নেই।
+//  নতুন প্যাসেজ যোগ করতে হলে ওই দুটো ফাইলের কোনোটি বদলাতে হবে, এই ফাইল নয়।
 // =====================================================================
 
-import { defaultPassages as basePassages } from './passages-base.js';
 import { longPassagesEn } from './passages-en-long.js';
 import { longPassagesBn } from './passages-bn-long.js';
 
 export const defaultPassages = {
-  en: [...basePassages.en, ...longPassagesEn],
-  bn: [...basePassages.bn, ...longPassagesBn],
+  en: [...longPassagesEn],
+  bn: [...longPassagesBn],
 };
