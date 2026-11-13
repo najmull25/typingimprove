@@ -1,0 +1,54 @@
+<!-- হোম পেজের লেখা ও কাঠামো (src/home/home.html) -->
+
+<div class="hero">
+  <div>
+    <h1>Improve Your <em>Typing Speed</em></h1>
+    <p>বাংলা ও ইংরেজি টাইপিং অনুশীলন করুন। প্রতিদিন একটু একটু করে এগিয়ে যান।</p>
+    <button id="goToPracticeBtn">▶ টাইপিং প্র্যাকটিস শুরু করুন</button>
+  </div>
+  <div class="laptop" aria-hidden="true">
+    <div class="screen">Typing<br />Makes You Better<i></i></div>
+    <div class="base"></div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="ico c1">🏆</div><div><span>সর্বোচ্চ WPM</span><b id="hpBest">0</b></div></div>
+  <div class="stat"><div class="ico c2">🎯</div><div><span>সর্বশেষ WPM</span><b id="hpLast">0</b></div></div>
+  <div class="stat"><div class="ico c3">⚡</div><div><span>আজকের টেস্ট</span><b id="hpToday">0</b></div></div>
+  <div class="stat"><div class="ico c4">📈</div><div><span>মোট টেস্ট</span><b id="hpTotal">0</b></div></div>
+</div>
+
+<div class="hp-grid">
+  <div class="hp-card">
+    <div class="hp-head">
+      <h3>⌨ লাইভ ডেমো</h3>
+      <div class="hp-tabs">
+        <button type="button" class="on" data-lang="en">English</button>
+        <button type="button" data-lang="bn">বাংলা</button>
+      </div>
+    </div>
+    <div class="hp-demo"><span id="hpTyped"></span><span class="caret"></span><span id="hpRest"></span></div>
+    <div class="hp-bar"><i id="hpProgress"></i></div>
+    <div class="hp-actions">
+      <button type="button" class="btn-main" id="hpStartBtn">▶ Start Typing</button>
+      <button type="button" class="btn-soft" id="hpResultsBtn">📊 View Results</button>
+    </div>
+  </div>
+
+  <div class="hp-side">
+    <div class="hp-card">
+      <h3>💡 টাইপিং টিপস</h3>
+      <ul class="tips">
+        <li>সব আঙুল ব্যবহার করুন</li>
+        <li>ছন্দ ধরে রাখুন</li>
+        <li>কিবোর্ডের দিকে তাকাবেন না</li>
+        <li>প্রতিদিন অনুশীলন করুন</li>
+      </ul>
+    </div>
+    <div class="hp-card quote">
+      <p style="margin: 0 0 6px">“ছোট ছোট পদক্ষেপই প্রতিদিন বড় উন্নতি আনে।”</p>
+      <b>এগিয়ে চলুন!</b>
+    </div>
+  </div>
+</div>
