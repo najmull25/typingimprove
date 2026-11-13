@@ -91,3 +91,25 @@ body.dark .quote { background:linear-gradient(160deg,#2e2566,#1e3a8a); color:#ff
   .hero h1 em { font-size:2.6rem; }
   .laptop { display:none; }
 }
+
+/* ---------- ৫. Practice পেজের কন্ট্রোল: এক লাইন + রঙ ---------- */
+.content .controls { flex-wrap: nowrap; }
+.content .controls select#language,
+.content .controls select#duration,
+.content .controls button { flex: none; white-space: nowrap; }
+.content .controls select#passageSelect { flex: 1 1 0; min-width: 0; }
+
+/* তিনটি ড্রপডাউনের রঙ (হালকা নীল ব্যাকগ্রাউন্ড) */
+.content .controls select { background-color: #dbeafe; border: 1.5px solid #93c5fd; color: #0f1e3d; font-weight: 600; }
+.content .controls select:hover { background-color: #bfdbfe; }
+.content .controls select:focus { outline: 2px solid #2563eb; }
+.content .controls select option { background: #fff; color: #0f1e3d; }
+body.dark .content .controls select { background-color: #1e3a8a; border-color: #3b82f6; color: #f1f5f9; }
+body.dark .content .controls select:hover { background-color: #1e40af; }
+body.dark .content .controls select option { background: #142036; color: #f1f5f9; }
+
+/* জায়গা কম হলে প্যাসেজের ড্রপডাউন আলাদা লাইনে, নিচে চলে যাবে */
+@media (max-width: 1150px) {
+  .content .controls { flex-wrap: wrap; }
+  .content .controls select#passageSelect { flex: 1 1 100%; order: 5; }
+}
