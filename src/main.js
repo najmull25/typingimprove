@@ -2,6 +2,15 @@ import { defaultPassages } from './passages.js';
 
 const $ = (id) => document.getElementById(id);
 
+// য়, ড়, ঢ় দুইভাবে লেখা যায় (একক অক্ষর বা মূল অক্ষর + নুক্তা)।
+// তুলনার আগে সবটাকে একই রূপে আনা হয়।
+function normalizeBangla(text) {
+  return String(text)
+    .replace(/\u09AF\u09BC/g, '\u09DF') // য + ় → য়
+    .replace(/\u09A1\u09BC/g, '\u09DC') // ড + ় → ড়
+    .replace(/\u09A2\u09BC/g, '\u09DD'); // ঢ + ় → ঢ়
+}
+
 // ================= STORAGE HELPERS =================
 
 function loadJSON(key, fallback) {
@@ -48,9 +57,9 @@ function getCurrentPassage() {
 
   const value = $('passageSelect').value;
 
-  if (value === 'temp') return tempPassage;
+  if (value === 'temp') return normalizeBangla(tempPassage);
 
-  return getLibrary($('language').value)[Number(value)]?.text || '';
+  return normalizeBangla(getLibrary($('language').value)[Number(value)]?.text || '');
 }
 
 // ================= HELPERS =================
@@ -108,7 +117,7 @@ function renderHighlight() {
   if (!box || isCustomMode) return;
 
   const text = getCurrentPassage();
-  const typed = Array.from($('typingInput').value);
+  const typed = Array.from(normalizeBangla($('typingInput').value));
   const segments = getSegments(text);
 
   let position = 0;
@@ -240,7 +249,7 @@ function resetTest() {
 // ================= UPDATE STATISTICS =================
 
 function updateStats() {
-  const typedText = $('typingInput').value;
+  const typedText = normalizeBangla($('typingInput').value);
 
   const input = Array.from(typedText);
 
@@ -816,7 +825,7 @@ typingBox.addEventListener('input', () => {
 
   if (
     !isCustomMode &&
-    Array.from(typingBox.value).length >= Array.from(getCurrentPassage()).length
+    Array.from(normalizeBangla(typingBox.value)).length >= Array.from(getCurrentPassage()).length
   ) {
     finishTest();
   }
