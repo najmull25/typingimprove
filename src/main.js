@@ -12,10 +12,21 @@ function normalizeBangla(text) {
 }
 
 // ================= STORAGE HELPERS =================
+// লগইন করা ইউজারের ডাটা আলাদা key-তে থাকে (যেমন history:UID),
+// লগইন ছাড়া থাকলে আগের মতোই সাধারণ key (history) ব্যবহার হয়।
+
+let currentUid = null;
+
+const userKey = (key) => (currentUid ? `${key}:${currentUid}` : key);
+
+const ls = {
+  get: (key) => localStorage.getItem(userKey(key)),
+  set: (key, value) => localStorage.setItem(userKey(key), value),
+};
 
 function loadJSON(key, fallback) {
   try {
-    const value = localStorage.getItem(key);
+    const value = localStorage.getItem(userKey(key));
     return value ? JSON.parse(value) : fallback;
   } catch {
     return fallback;
@@ -24,7 +35,7 @@ function loadJSON(key, fallback) {
 
 function saveJSON(key, value) {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    localStorage.setItem(userKey(key), JSON.stringify(value));
   } catch {
     /* storage full or blocked */
   }
@@ -398,11 +409,11 @@ function renderChart(history) {
 // ================= DASHBOARD =================
 
 function renderDashboard() {
-  $('bestWpm').textContent = localStorage.getItem('bestWpm') || 0;
+  $('bestWpm').textContent = ls.get('bestWpm') || 0;
 
-  $('lowestWpm').textContent = localStorage.getItem('lowestWpm') || 0;
+  $('lowestWpm').textContent = ls.get('lowestWpm') || 0;
 
-  $('totalTests').textContent = localStorage.getItem('totalTests') || 0;
+  $('totalTests').textContent = ls.get('totalTests') || 0;
 
   const today = new Date().toLocaleDateString();
 
@@ -657,6 +668,26 @@ function renderHistory() {
     rows;
 }
 
+// ================= CLOUD সংযোগ (auth.js এই ফাংশনগুলো ব্যবহার করে) =================
+
+// ক্লাউডে পাঠানোর জন্য বর্তমান ইউজারের সব ডাটার কপি
+function getSnapshot() {
+  return {
+    history: loadJSON('history', []),
+    dailyStats: loadDailyStats(),
+    bestWpm: Number(ls.get('bestWpm') || 0),
+    lowestWpm: Number(ls.get('lowestWpm') || 0),
+    totalTests: Number(ls.get('totalTests') || 0),
+  };
+}
+
+// লগইন বা লগআউট হলে auth.js এটা ডাকে, তখন ডাটা ওই ইউজারের key-তে বদলে যায়
+window.setCurrentUser = (uid) => {
+  currentUid = uid || null;
+
+  renderDashboard();
+};
+
 // ================= FINISH TEST =================
 
 function finishTest() {
@@ -682,19 +713,19 @@ function finishTest() {
 
   const wpm = Number($('wpmWithSpace').textContent);
 
-  const total = Number(localStorage.getItem('totalTests') || 0) + 1;
+  const total = Number(ls.get('totalTests') || 0) + 1;
 
-  const best = Math.max(wpm, Number(localStorage.getItem('bestWpm') || 0));
+  const best = Math.max(wpm, Number(ls.get('bestWpm') || 0));
 
-  const oldLowest = Number(localStorage.getItem('lowestWpm') || 0);
+  const oldLowest = Number(ls.get('lowestWpm') || 0);
 
   const lowest = oldLowest === 0 ? wpm : Math.min(wpm, oldLowest);
 
-  localStorage.setItem('totalTests', total);
+  ls.set('totalTests', total);
 
-  localStorage.setItem('bestWpm', best);
+  ls.set('bestWpm', best);
 
-  localStorage.setItem('lowestWpm', lowest);
+  ls.set('lowestWpm', lowest);
 
   const history = loadJSON('history', []);
 
@@ -758,6 +789,13 @@ function finishTest() {
   }
 
   renderDashboard();
+
+  // লগইন থাকলে ইউজারের সব ডাটা ক্লাউডে সেভ হবে (auth.js এটা হ্যান্ডেল করে)
+  window.saveResultToCloud?.({
+    wpm,
+    accuracy: parseInt($('accuracy').textContent, 10) || 0,
+    snapshot: getSnapshot(),
+  });
 
   // alert-এর বদলে সরাসরি রেজাল্টে স্ক্রল করে নিয়ে যাওয়া হয়
   const resultPanel = document.querySelector('.result-panel');
