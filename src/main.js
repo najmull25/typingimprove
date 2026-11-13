@@ -136,13 +136,7 @@ function renderHighlight() {
       currentMarked = true;
     }
 
-    // এন্টার (নতুন লাইন) চোখে দেখা যায় না, তাই ↵ চিহ্ন দেখানো হয়।
-    // ভুল করে স্পেস দিলে এই চিহ্নটা লাল হবে।
-    const shown = segment.includes('\n')
-      ? '↵' + segment
-      : escapeHTML(segment);
-
-    html += `<span class="${cls}">${shown}</span>`;
+    html += `<span class="${cls}">${escapeHTML(segment)}</span>`;
 
     position += length;
   }
