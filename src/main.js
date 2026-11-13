@@ -826,6 +826,8 @@ function tick() {
 }
 
 function startTest() {
+  if (!window.typingAllowed) return; // লগইন ও অ্যাপ্রুভ ছাড়া টেস্ট শুরু হবে না
+
   if (finished) {
     resetTest();
   }
@@ -860,6 +862,11 @@ $('startBtn').addEventListener('click', () => {
 const typingBox = $('typingInput');
 
 typingBox.addEventListener('input', () => {
+  if (!window.typingAllowed) {
+    typingBox.value = '';
+    return;
+  }
+
   if (finished) return;
 
   // প্রথম অক্ষর টাইপ করলেই টাইমার শুরু হবে
