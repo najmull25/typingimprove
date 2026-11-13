@@ -99,14 +99,14 @@ body.dark .quote { background:linear-gradient(160deg,#2e2566,#1e3a8a); color:#ff
 .content .controls button { flex: none; white-space: nowrap; }
 .content .controls select#passageSelect { flex: 1 1 0; min-width: 0; }
 
-/* তিনটি ড্রপডাউনের রঙ (হালকা নীল ব্যাকগ্রাউন্ড) */
-.content .controls select { background-color: #dbeafe; border: 1.5px solid #93c5fd; color: #0f1e3d; font-weight: 600; }
-.content .controls select:hover { background-color: #bfdbfe; }
-.content .controls select:focus { outline: 2px solid #2563eb; }
-.content .controls select option { background: #fff; color: #0f1e3d; }
-body.dark .content .controls select { background-color: #1e3a8a; border-color: #3b82f6; color: #f1f5f9; }
-body.dark .content .controls select:hover { background-color: #1e40af; }
-body.dark .content .controls select option { background: #142036; color: #f1f5f9; }
+/* তিনটি ড্রপডাউনের রঙ (Soft Orange: হালকা কমলা ব্যাকগ্রাউন্ড, কমলা বর্ডার) */
+.content .controls select { background-color: #ffedd5; border: 1.5px solid #fb923c; border-radius: 10px; color: #431407; font-weight: 600; }
+.content .controls select:hover { background-color: #fed7aa; }
+.content .controls select:focus { outline: 2px solid #ea580c; }
+.content .controls select option { background: #fff; color: #431407; }
+body.dark .content .controls select { background-color: #7c2d12; border-color: #fb923c; color: #ffedd5; }
+body.dark .content .controls select:hover { background-color: #9a3412; }
+body.dark .content .controls select option { background: #1f1410; color: #ffedd5; }
 
 /* জায়গা কম হলে প্যাসেজের ড্রপডাউন আলাদা লাইনে, নিচে চলে যাবে */
 @media (max-width: 1150px) {
