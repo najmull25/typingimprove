@@ -88,6 +88,36 @@ body.dark .pay-box { background:#1e293b; }
 .pay-note { margin:14px 0 0; color:#64748b; font-size:.95rem; line-height:1.7; }
 body.dark .pay-note { color:#94a3b8; }
 
+/* ===== প্ল্যান বক্স, Confirm বাটন ও পেমেন্ট ফর্ম ===== */
+.plan-item { display:flex; flex-direction:column; gap:10px; }
+.plan-badge { display:inline-block; margin-top:10px; padding:3px 12px; border-radius:99px; font-size:.85rem; font-weight:700; background:rgba(22,163,74,.15); color:#16a34a; }
+.plan-badge.none { background:transparent; color:#94a3b8; }
+.btn-confirm { width:100%; background:#16a34a; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:200; padding:16px; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; color:#1e293b; width:min(480px,100%); max-height:92vh; overflow-y:auto; border-radius:12px; padding:22px; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+body.dark .modal { background:#1e293b; color:#f8fafc; }
+.modal-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:14px; }
+.modal-head h3 { margin:0; }
+.modal-head p { margin:4px 0 0; font-weight:700; color:#16a34a; }
+.modal-close { background:transparent; color:inherit; padding:4px 10px; font-size:1.1rem; }
+.field { margin-bottom:14px; }
+.field > label { display:block; font-weight:600; margin-bottom:6px; font-size:.95rem; }
+.field input[type="text"], .field input[type="number"], .field input[type="tel"] { width:100%; }
+.field input[readonly] { opacity:.75; cursor:not-allowed; }
+.method-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.method-opt { position:relative; }
+.method-opt input { position:absolute; opacity:0; pointer-events:none; }
+.method-opt .m { display:flex; align-items:center; gap:10px; padding:10px 12px; border:2px solid #e2e8f0; border-radius:10px; cursor:pointer; font-weight:700; }
+body.dark .method-opt .m { border-color:#334155; }
+.method-opt input:checked + .m { border-color:#16a34a; background:rgba(22,163,74,.1); }
+.method-opt input:focus-visible + .m { outline:2px solid #3b82f6; }
+.method-opt svg { width:28px; height:28px; flex:none; }
+.pay-msg { min-height:1.4em; margin:0 0 10px; font-weight:600; color:#dc2626; }
+.pay-msg.ok { color:#16a34a; }
+.my-pay-row { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 4px; border-bottom:1px solid #e2e8f0; }
+body.dark .my-pay-row { border-bottom-color:#334155; }
+
 /* ===== লগইন বাধ্যতামূলক (Access Gate) ===== */
 body:not(.approved) #practiceBody { display:none; }
 body.approved #accessGate { display:none; }
@@ -289,26 +319,46 @@ body.dark .drawer-header { border-bottom-color:#334155; }
         <p class="result-note">আপনার পছন্দের প্ল্যানে ক্লিক করুন।</p>
 
         <div class="plan-grid">
-          <button type="button" class="plan-card" data-name="1 Month" data-price="40">
-            <span class="plan-name">1 Month</span>
-            <span class="plan-price">40 <small>TK</small></span>
-            <span class="plan-pick">Select plan</span>
-          </button>
-          <button type="button" class="plan-card" data-name="2 Months" data-price="70">
-            <span class="plan-name">2 Months</span>
-            <span class="plan-price">70 <small>TK</small></span>
-            <span class="plan-pick">Select plan</span>
-          </button>
-          <button type="button" class="plan-card" data-name="6 Months" data-price="200">
-            <span class="plan-name">6 Months</span>
-            <span class="plan-price">200 <small>TK</small></span>
-            <span class="plan-pick">Select plan</span>
-          </button>
-          <button type="button" class="plan-card" data-name="1 Year" data-price="300">
-            <span class="plan-name">1 Year</span>
-            <span class="plan-price">300 <small>TK</small></span>
-            <span class="plan-pick">Select plan</span>
-          </button>
+          <div class="plan-item">
+            <button type="button" class="plan-card" data-name="1 Month" data-price="50">
+              <span class="plan-name">1 Month</span>
+              <span class="plan-price">50 <small>TK</small></span>
+              <span class="plan-badge none">—</span>
+            </button>
+            <button type="button" class="btn-confirm" data-name="1 Month" data-price="50">✔ Confirm</button>
+          </div>
+          <div class="plan-item">
+            <button type="button" class="plan-card" data-name="2 Months" data-price="90">
+              <span class="plan-name">2 Months</span>
+              <span class="plan-price">90 <small>TK</small></span>
+              <span class="plan-badge">10% OFF</span>
+            </button>
+            <button type="button" class="btn-confirm" data-name="2 Months" data-price="90">✔ Confirm</button>
+          </div>
+          <div class="plan-item">
+            <button type="button" class="plan-card" data-name="3 Months" data-price="120">
+              <span class="plan-name">3 Months</span>
+              <span class="plan-price">120 <small>TK</small></span>
+              <span class="plan-badge">20% OFF</span>
+            </button>
+            <button type="button" class="btn-confirm" data-name="3 Months" data-price="120">✔ Confirm</button>
+          </div>
+          <div class="plan-item">
+            <button type="button" class="plan-card" data-name="6 Months" data-price="200">
+              <span class="plan-name">6 Months</span>
+              <span class="plan-price">200 <small>TK</small></span>
+              <span class="plan-badge">33.33% OFF</span>
+            </button>
+            <button type="button" class="btn-confirm" data-name="6 Months" data-price="200">✔ Confirm</button>
+          </div>
+          <div class="plan-item">
+            <button type="button" class="plan-card" data-name="1 Year" data-price="300">
+              <span class="plan-name">1 Year</span>
+              <span class="plan-price">300 <small>TK</small></span>
+              <span class="plan-badge">50% OFF</span>
+            </button>
+            <button type="button" class="btn-confirm" data-name="1 Year" data-price="300">✔ Confirm</button>
+          </div>
         </div>
 
         <!-- প্ল্যানে ক্লিক করলে এই বক্স দেখাবে -->
@@ -322,8 +372,11 @@ body.dark .drawer-header { border-bottom-color:#334155; }
           </div>
           <div>Bkash / Nagad / Rocket / Upay — All Method</div>
           <p class="pay-note">*Note: If any problem contact 01743775043 (WhatsApp)</p>
-          <p class="pay-note">টাকা পাঠানোর পর WhatsApp-এ আপনার Gmail ও প্ল্যানের নাম জানান। যাচাই করে অ্যাডমিন প্ল্যান চালু করে দেবেন।</p>
+          <p class="pay-note">টাকা পাঠানোর পর প্ল্যানের নিচের সবুজ <strong>Confirm</strong> বাটনে চেপে ফর্মটি পূরণ করুন। যাচাই করে অ্যাডমিন প্ল্যান চালু করে দেবেন।</p>
         </div>
+
+        <h3 style="margin-top: 30px">আপনার পেমেন্ট রিকোয়েস্ট</h3>
+        <div id="myPayments" class="history-box">লোড হচ্ছে...</div>
       </section>
 
       <!-- ৫. নতুন: লিডারবোর্ড (ভেতরের তথ্য src/auth.js ভরে দেয়) -->
@@ -337,12 +390,88 @@ body.dark .drawer-header { border-bottom-color:#334155; }
       <section class="page-section" id="adminPage">
         <h2>🛡️ ইউজার ম্যানেজমেন্ট</h2>
         <p class="result-note">নতুন ইউজাররা লগইন করার পর "Pending" থাকে। আপনি Approve করলে তারা টাইপ করতে পারবে।</p>
+        <h3>💳 পেমেন্ট রিকোয়েস্ট</h3>
+        <div id="adminPayments" class="history-box">লোড হচ্ছে...</div>
+
+        <h3 style="margin-top: 28px">👥 সব ইউজার</h3>
         <div id="adminBox" class="history-box">লোড হচ্ছে...</div>
       </section>
 
     </main>
 
     <footer>© 2026 TypingBD | Practice Makes Perfect</footer>
+  </div>
+</div>
+
+<!-- পেমেন্ট কনফার্ম ফর্ম (পপআপ) -->
+<div id="payOverlay" class="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="payTitle">Payment Confirmation</h3>
+        <p id="payPlanLabel"></p>
+      </div>
+      <button type="button" id="payCloseBtn" class="modal-close" aria-label="বন্ধ করুন">✕</button>
+    </div>
+
+    <form id="payForm" autocomplete="off">
+      <div class="field">
+        <label for="payUser">User ID (Auto - Gmail)</label>
+        <input type="text" id="payUser" readonly />
+      </div>
+
+      <div class="field">
+        <label>Select Payment Method</label>
+        <div class="method-grid">
+          <label class="method-opt">
+            <input type="radio" name="payMethod" value="Bkash" />
+            <span class="m">
+              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#E2136E"/><text x="20" y="28" text-anchor="middle" font-size="24" font-weight="800" fill="#fff" font-family="Arial, sans-serif">b</text></svg>
+              Bkash
+            </span>
+          </label>
+          <label class="method-opt">
+            <input type="radio" name="payMethod" value="Nagad" />
+            <span class="m">
+              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#F6921E"/><text x="20" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#fff" font-family="Arial, sans-serif">N</text></svg>
+              Nagad
+            </span>
+          </label>
+          <label class="method-opt">
+            <input type="radio" name="payMethod" value="Rocket" />
+            <span class="m">
+              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#8C3494"/><text x="20" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#fff" font-family="Arial, sans-serif">R</text></svg>
+              Rocket
+            </span>
+          </label>
+          <label class="method-opt">
+            <input type="radio" name="payMethod" value="Upay" />
+            <span class="m">
+              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#1C4FA0"/><text x="20" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#FFC20E" font-family="Arial, sans-serif">U</text></svg>
+              Upay
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="payTrx">Transaction ID (TrxID)</label>
+        <input type="text" id="payTrx" maxlength="20" placeholder="যেমন: 8N7A6D5E4F" required />
+      </div>
+
+      <div class="field">
+        <label for="payAmount">Sending Amount</label>
+        <input type="number" id="payAmount" min="1" max="5000" step="1" placeholder="যত টাকা পাঠিয়েছেন" required />
+      </div>
+
+      <div class="field">
+        <label for="paySender">Sender Number</label>
+        <input type="tel" id="paySender" maxlength="11" inputmode="numeric" placeholder="01XXXXXXXXX" required />
+      </div>
+
+      <p id="payMsg" class="pay-msg"></p>
+      <button type="submit" id="paySubmitBtn" class="btn-confirm">✔ Confirm Payment</button>
+    </form>
   </div>
 </div>
 
