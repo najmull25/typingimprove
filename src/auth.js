@@ -11,7 +11,7 @@ import {
   signInWithPopup, signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import {
-  doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, orderBy, limit,
+  doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, orderBy, limit, where,
   getDocs, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
@@ -19,7 +19,7 @@ import {
 const ADMIN_EMAIL = 'najmul0174.bd@gmail.com';
 
 // প্ল্যানের নাম → কত মাস
-const PLANS = { '1 Month': 1, '2 Months': 2, '6 Months': 6, '1 Year': 12 };
+const PLANS = { '1 Month': 1, '2 Months': 2, '3 Months': 3, '6 Months': 6, '1 Year': 12 };
 const FAR_FUTURE = 4102444800000; // ১ জানুয়ারি ২১০০ (অ্যাডমিনের জন্য)
 
 const $ = (id) => document.getElementById(id);
@@ -265,6 +265,7 @@ onAuthStateChanged(auth, async (user) => {
     window.setCurrentUser?.(null);
     showGate('loggedout');
     renderMyPlan();
+    loadMyPayments();
     if ($('leaderboardPage').style.display === 'block') loadLeaderboard();
     return;
   }
@@ -284,6 +285,8 @@ onAuthStateChanged(auth, async (user) => {
     showGate('error');
     return;
   }
+
+  loadMyPayments();
 
   // রিয়েল-টাইম: অ্যাডমিন প্ল্যান চালু করলেই ইউজারের পেজ নিজে থেকে খুলে যাবে
   unsubMember = onSnapshot(
@@ -376,16 +379,20 @@ async function loadLeaderboard() {
 const STATUS_LABEL = { pending: 'Pending', approved: 'Active', expired: 'Expired', rejected: 'Rejected' };
 
 // প্ল্যান চালু বা মেয়াদ বাড়ানো। মেয়াদ থাকলে বাকি সময়ের ওপর যোগ হয়, শেষ হলে আজ থেকে গোনা হয়।
-async function approveWithPlan(m, planName) {
+async function applyPlan(m, planName) {
   const months = PLANS[planName];
-  if (!months) return;
+  if (!months) throw new Error('অজানা প্ল্যান: ' + planName);
 
   const base = isActive(m) ? Number(m.expiresAt) : Date.now();
   const d = new Date(base);
   d.setMonth(d.getMonth() + months);
 
+  await updateDoc(memberRef(m.id), { status: 'approved', plan: planName, expiresAt: d.getTime() });
+}
+
+async function approveWithPlan(m, planName) {
   try {
-    await updateDoc(memberRef(m.id), { status: 'approved', plan: planName, expiresAt: d.getTime() });
+    await applyPlan(m, planName);
     loadAdmin();
   } catch (e) {
     console.error(e);
@@ -407,6 +414,7 @@ async function loadAdmin() {
   const box = $('adminBox');
   if (!isAdmin) { box.textContent = 'এই পেজ শুধু অ্যাডমিনের জন্য।'; return; }
   box.textContent = 'লোড হচ্ছে...';
+  loadAdminPayments();
 
   try {
     const snap = await getDocs(query(collection(db, 'members'), limit(500)));
@@ -487,6 +495,225 @@ async function loadAdmin() {
   }
 }
 
+// ---------- পেমেন্ট কনফার্ম ফর্ম ----------
+let payPlan = null;
+const tsOf = (x) => (x.createdAt && x.createdAt.seconds) || 0;
+const PAY_STATUS = { pending: 'Pending', approved: 'Approved', rejected: 'Rejected' };
+
+function openPayForm(name, price) {
+  if (!currentUser) {
+    alert('পেমেন্ট কনফার্ম করতে আগে Google দিয়ে লগইন করুন।');
+    login();
+    return;
+  }
+  payPlan = { name, price };
+  $('payPlanLabel').textContent = `${name} — ${price} TK`;
+  $('payUser').value = currentUser.email || '';
+  $('payAmount').value = price;
+  $('payTrx').value = '';
+  $('paySender').value = '';
+  document.querySelectorAll('input[name="payMethod"]').forEach((r) => (r.checked = false));
+  setPayMsg('');
+  $('paySubmitBtn').disabled = false;
+  $('payOverlay').classList.add('open');
+}
+
+function closePayForm() {
+  $('payOverlay').classList.remove('open');
+}
+
+function setPayMsg(text, ok = false) {
+  const el = $('payMsg');
+  el.textContent = text;
+  el.className = 'pay-msg' + (ok ? ' ok' : '');
+}
+
+document.querySelectorAll('.btn-confirm[data-name]').forEach((btn) => {
+  btn.addEventListener('click', () => openPayForm(btn.dataset.name, Number(btn.dataset.price)));
+});
+$('payCloseBtn').addEventListener('click', closePayForm);
+$('payOverlay').addEventListener('click', (e) => {
+  if (e.target === $('payOverlay')) closePayForm();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $('payOverlay').classList.contains('open')) closePayForm();
+});
+
+$('payForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!currentUser || !payPlan) return;
+
+  const method = document.querySelector('input[name="payMethod"]:checked')?.value;
+  const trx = $('payTrx').value.trim().toUpperCase();
+  const amount = Number($('payAmount').value);
+  const sender = $('paySender').value.trim();
+
+  if (!method) return setPayMsg('পেমেন্ট মেথড বেছে নিন।');
+  if (!/^[A-Z0-9]{6,20}$/.test(trx)) return setPayMsg('TrxID শুধু ইংরেজি অক্ষর ও সংখ্যা হবে (৬ থেকে ২০টি)।');
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 5000) return setPayMsg('সঠিক টাকার পরিমাণ লিখুন।');
+  if (!/^01[3-9][0-9]{8}$/.test(sender)) return setPayMsg('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন 01XXXXXXXXX)।');
+
+  $('paySubmitBtn').disabled = true;
+  setPayMsg('জমা দেওয়া হচ্ছে...', true);
+
+  try {
+    // ডকুমেন্টের নাম মেথড+TrxID, তাই একই TrxID দ্বিতীয়বার জমা দেওয়া যায় না
+    await setDoc(doc(db, 'payments', `${method}_${trx}`), {
+      uid: currentUser.uid,
+      email: currentUser.email || '',
+      name: currentUser.displayName || 'ইউজার',
+      plan: payPlan.name,
+      amount,
+      method,
+      trxId: trx,
+      senderNumber: sender,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+    setPayMsg('✔ রিকোয়েস্ট জমা হয়েছে। অ্যাডমিন যাচাই করে প্ল্যান চালু করে দেবেন।', true);
+    loadMyPayments();
+    setTimeout(closePayForm, 1800);
+  } catch (err) {
+    console.error(err);
+    setPayMsg('জমা দেওয়া যায়নি। এই TrxID আগেই জমা দেওয়া হয়ে থাকতে পারে, অথবা Firestore Rules Publish হয়নি।');
+    $('paySubmitBtn').disabled = false;
+  }
+});
+
+// ---------- ইউজারের নিজের পেমেন্ট রিকোয়েস্ট ----------
+async function loadMyPayments() {
+  const box = $('myPayments');
+  if (!box) return;
+
+  if (!currentUser) {
+    box.textContent = 'পেমেন্ট রিকোয়েস্ট দেখতে লগইন করুন।';
+    return;
+  }
+
+  try {
+    const snap = await getDocs(query(collection(db, 'payments'), where('uid', '==', currentUser.uid), limit(20)));
+    if (snap.empty) { box.textContent = 'এখনো কোনো পেমেন্ট রিকোয়েস্ট জমা দেননি।'; return; }
+
+    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => tsOf(b) - tsOf(a));
+    const frag = document.createDocumentFragment();
+
+    list.forEach((p) => {
+      const row = document.createElement('div');
+      row.className = 'my-pay-row';
+
+      const info = document.createElement('span');
+      info.textContent = `${p.plan} · ${p.amount} TK · ${p.method} · TrxID: ${p.trxId}`;
+
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + (p.status || 'pending');
+      badge.textContent = PAY_STATUS[p.status] || 'Pending';
+
+      row.append(info, badge);
+      frag.appendChild(row);
+    });
+
+    box.replaceChildren(frag);
+  } catch (e) {
+    console.error(e);
+    box.textContent = 'রিকোয়েস্ট লোড করা যায়নি।';
+  }
+}
+
+// ---------- অ্যাডমিন: পেমেন্ট রিকোয়েস্ট ----------
+async function approvePayment(p) {
+  try {
+    const ms = await getDoc(memberRef(p.uid));
+    if (!ms.exists()) { alert('এই ইউজারের অ্যাকাউন্ট খুঁজে পাওয়া যায়নি।'); return; }
+
+    await applyPlan({ id: p.uid, ...ms.data() }, p.plan); // মেয়াদ বসানো বা বাড়ানো
+    await updateDoc(doc(db, 'payments', p.id), { status: 'approved' });
+    loadAdmin();
+  } catch (e) {
+    console.error(e);
+    alert('Approve করা যায়নি: ' + (e.code || e.message));
+  }
+}
+
+async function rejectPayment(p) {
+  try {
+    await updateDoc(doc(db, 'payments', p.id), { status: 'rejected' });
+    loadAdmin();
+  } catch (e) {
+    console.error(e);
+    alert('পরিবর্তন করা যায়নি: ' + (e.code || e.message));
+  }
+}
+
+async function loadAdminPayments() {
+  const box = $('adminPayments');
+  if (!box) return;
+
+  try {
+    const snap = await getDocs(query(collection(db, 'payments'), limit(300)));
+    if (snap.empty) { box.textContent = 'এখনো কোনো পেমেন্ট রিকোয়েস্ট আসেনি।'; return; }
+
+    const rank = { pending: 0, rejected: 1, approved: 2 };
+    const list = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (rank[a.status] ?? 3) - (rank[b.status] ?? 3) || tsOf(b) - tsOf(a)); // Pending আগে
+
+    const lines = (...texts) => {
+      const cell = document.createElement('div');
+      texts.forEach((t, i) => {
+        const el = document.createElement(i === 0 ? 'strong' : 'small');
+        el.textContent = t;
+        el.style.display = 'block';
+        cell.appendChild(el);
+      });
+      return cell;
+    };
+
+    const frag = document.createDocumentFragment();
+
+    list.forEach((p) => {
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+
+      const when = tsOf(p) ? fmtDate(tsOf(p) * 1000) : '';
+
+      const actions = document.createElement('div');
+      actions.className = 'admin-actions';
+
+      if (p.status === 'pending') {
+        const ok = document.createElement('button');
+        ok.className = 'btn-ok';
+        ok.textContent = '✔ Approve';
+        ok.addEventListener('click', () => approvePayment(p));
+
+        const no = document.createElement('button');
+        no.className = 'btn-no';
+        no.textContent = '✖ Reject';
+        no.addEventListener('click', () => rejectPayment(p));
+
+        actions.append(ok, no);
+      } else {
+        const badge = document.createElement('span');
+        badge.className = 'badge ' + p.status;
+        badge.textContent = PAY_STATUS[p.status] || p.status;
+        actions.appendChild(badge);
+      }
+
+      row.append(
+        lines(p.name || 'ইউজার', p.email || ''),
+        lines(`${p.plan} · ${p.amount} TK`, `${p.method} · Sender: ${p.senderNumber}`),
+        lines(`TrxID: ${p.trxId}`, when),
+        actions
+      );
+      frag.appendChild(row);
+    });
+
+    box.replaceChildren(frag);
+  } catch (e) {
+    console.error(e);
+    box.textContent = 'পেমেন্ট রিকোয়েস্ট লোড করা যায়নি (' + (e.code || e.message) + ')। Firestore Rules-এ payments অংশ যোগ ও Publish হয়েছে কি না দেখুন।';
+  }
+}
+
 // ---------- অতিরিক্ত পেজ (লিডারবোর্ড, অ্যাডমিন) দেখানো ----------
 const extraPages = ['leaderboardPage', 'adminPage'];
 const extraNavs = ['navLeaderboard', 'navAdmin'];
@@ -515,7 +742,7 @@ mainNavs.forEach((id) => {
   $(id).addEventListener('click', () => {
     extraPages.forEach((p) => ($(p).style.display = 'none'));
     extraNavs.forEach((n) => $(n).classList.remove('active'));
-    if (id === 'navSubscription') renderMyPlan();
+    if (id === 'navSubscription') { renderMyPlan(); loadMyPayments(); }
   });
 });
 
