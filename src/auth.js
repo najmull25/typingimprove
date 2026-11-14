@@ -96,7 +96,8 @@ function showGate(state) {
     $('gatePlanBtn').style.display = '';
   } else if (state === 'rejected') {
     title.textContent = '⛔ অ্যাকাউন্ট অনুমোদিত নয়';
-    text.textContent = 'অ্যাডমিন আপনার অ্যাকাউন্ট অনুমোদন করেননি। প্রয়োজনে অ্যাডমিনের সাথে যোগাযোগ করুন।';
+    text.textContent = 'অ্যাডমিন আপনার অ্যাকাউন্ট অনুমোদন করেননি। টাইপিং শুরু করতে একটি প্ল্যান নিন, অথবা প্রয়োজনে অ্যাডমিনের সাথে যোগাযোগ করুন।';
+    $('gatePlanBtn').style.display = '';
   } else if (state === 'error') {
     title.textContent = '⚠️ সমস্যা হয়েছে';
     text.textContent = 'সার্ভারের সাথে যোগাযোগ করা যায়নি। ইন্টারনেট দেখুন আর Firestore Rules Publish হয়েছে কি না যাচাই করুন, তারপর পেজ রিফ্রেশ করুন।';
