@@ -1,8 +1,8 @@
 // =====================================================================
-//  src/auth.js : লগইন বাধ্যতামূলক + অ্যাডমিন অ্যাপ্রুভাল + ইউজারের আলাদা ডাটা + লিডারবোর্ড
+//  src/auth.js : লগইন বাধ্যতামূলক + প্ল্যান/মেয়াদ + অ্যাডমিন অ্যাপ্রুভাল + ইউজারের আলাদা ডাটা + লিডারবোর্ড
 //
 //  Firestore-এ ডাটা থাকে তিন জায়গায়:
-//   members/{uid}               → অ্যাকাউন্টের অবস্থা: pending / approved / rejected
+//   members/{uid}               → status (pending/approved/rejected), plan, expiresAt (মিলিসেকেন্ড)
 //   users/{uid}                 → পাবলিক: নাম, ছবি, bestWpm (লিডারবোর্ডের জন্য)
 //   users/{uid}/private/state   → প্রাইভেট: ইউজারের নিজের history, dailyStats ইত্যাদি
 // =====================================================================
@@ -16,12 +16,16 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 // ★★★ এখানে আপনার নিজের Gmail বসান। Firestore Rules-এও ঠিক একই ইমেইল দিতে হবে। ★★★
-const ADMIN_EMAIL = 'najmul0174.bd@gmail.com';
+const ADMIN_EMAIL = 'YOUR_EMAIL@gmail.com';
+
+// প্ল্যানের নাম → কত মাস
+const PLANS = { '1 Month': 1, '2 Months': 2, '6 Months': 6, '1 Year': 12 };
+const FAR_FUTURE = 4102444800000; // ১ জানুয়ারি ২১০০ (অ্যাডমিনের জন্য)
 
 const $ = (id) => document.getElementById(id);
 
 let currentUser = null;
-let memberStatus = null; // 'pending' | 'approved' | 'rejected' | null
+let member = null; // members/{uid} ডকুমেন্টের সর্বশেষ ডাটা
 let isAdmin = false;
 let unsubMember = null;
 let stateLoadedFor = null;
@@ -30,7 +34,24 @@ const memberRef = (uid) => doc(db, 'members', uid);
 const publicRef = (uid) => doc(db, 'users', uid);
 const stateRef = (uid) => doc(db, 'users', uid, 'private', 'state');
 
-window.typingAllowed = false; // অ্যাপ্রুভ না হওয়া পর্যন্ত টাইপিং বন্ধ
+window.typingAllowed = false; // অ্যাপ্রুভ ও মেয়াদ না থাকলে টাইপিং বন্ধ
+
+// ---------- মেয়াদ সংক্রান্ত সাহায্যকারী ----------
+const isActive = (m) =>
+  !!m && m.status === 'approved' && Number(m.expiresAt || 0) > Date.now();
+
+function effectiveStatus(m) {
+  if (m.status === 'approved') return isActive(m) ? 'approved' : 'expired';
+  return m.status || 'pending';
+}
+
+function fmtDate(ms) {
+  return new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function daysLeft(ms) {
+  return Math.max(0, Math.ceil((ms - Date.now()) / 86400000));
+}
 
 // ---------- লগইন / লগআউট ----------
 async function login() {
@@ -47,6 +68,7 @@ async function login() {
 $('loginBtn').addEventListener('click', login);
 $('gateLoginBtn').addEventListener('click', login);
 $('logoutBtn').addEventListener('click', () => signOut(auth));
+$('gatePlanBtn').addEventListener('click', () => $('navSubscription').click());
 
 // ---------- টাইপিং গেট (কী দেখাবে) ----------
 function setAllowed(allowed) {
@@ -57,23 +79,61 @@ function setAllowed(allowed) {
 function showGate(state) {
   const title = $('gateTitle');
   const text = $('gateText');
-  const btn = $('gateLoginBtn');
-  btn.style.display = 'none';
+  $('gateLoginBtn').style.display = 'none';
+  $('gatePlanBtn').style.display = 'none';
 
   if (state === 'loggedout') {
     title.textContent = '🔒 টাইপ করতে লগইন করুন';
-    text.textContent = 'এই সাইটে টাইপিং প্র্যাকটিস করতে Google দিয়ে লগইন করা বাধ্যতামূলক। লগইনের পর অ্যাডমিন আপনার অ্যাকাউন্ট অ্যাপ্রুভ করলে টাইপ করতে পারবেন।';
-    btn.style.display = '';
+    text.textContent = 'এই সাইটে টাইপিং প্র্যাকটিস করতে Google দিয়ে লগইন করা বাধ্যতামূলক। লগইনের পর একটি প্ল্যান চালু থাকলে টাইপ করতে পারবেন।';
+    $('gateLoginBtn').style.display = '';
   } else if (state === 'pending') {
-    title.textContent = '⏳ অ্যাপ্রুভালের অপেক্ষায়';
-    text.textContent = 'আপনার অ্যাকাউন্ট তৈরি হয়েছে, কিন্তু অ্যাডমিন এখনো অ্যাপ্রুভ করেননি। অ্যাপ্রুভ হলে এই পেজ নিজে থেকেই খুলে যাবে, রিফ্রেশ করার দরকার নেই।';
+    title.textContent = '⏳ প্ল্যান চালুর অপেক্ষায়';
+    text.textContent = 'আপনার অ্যাকাউন্ট তৈরি হয়েছে। একটি প্ল্যান বেছে টাকা পাঠান, অ্যাডমিন যাচাই করে চালু করলে এই পেজ নিজে থেকেই খুলে যাবে, রিফ্রেশ করার দরকার নেই।';
+    $('gatePlanBtn').style.display = '';
+  } else if (state === 'expired') {
+    title.textContent = '⌛ প্ল্যানের মেয়াদ শেষ';
+    text.textContent = 'আপনার প্ল্যানের মেয়াদ শেষ হয়ে গেছে। টাইপিং চালিয়ে যেতে নতুন প্ল্যান নিন। অ্যাডমিন চালু করলে পেজ নিজে থেকেই খুলে যাবে।';
+    $('gatePlanBtn').style.display = '';
   } else if (state === 'rejected') {
-    title.textContent = '⛔ অ্যাকাউন্ট অনুমোদিত হয়নি';
+    title.textContent = '⛔ অ্যাকাউন্ট অনুমোদিত নয়';
     text.textContent = 'অ্যাডমিন আপনার অ্যাকাউন্ট অনুমোদন করেননি। প্রয়োজনে অ্যাডমিনের সাথে যোগাযোগ করুন।';
   } else if (state === 'error') {
     title.textContent = '⚠️ সমস্যা হয়েছে';
     text.textContent = 'সার্ভারের সাথে যোগাযোগ করা যায়নি। ইন্টারনেট দেখুন আর Firestore Rules Publish হয়েছে কি না যাচাই করুন, তারপর পেজ রিফ্রেশ করুন।';
   }
+}
+
+// ---------- Subscription পেজের "আপনার প্ল্যান" বক্স ----------
+function renderMyPlan() {
+  const box = $('myPlanBox');
+  if (!box) return;
+  box.className = 'my-plan';
+
+  if (!currentUser) {
+    box.textContent = 'আপনার প্ল্যান দেখতে আগে লগইন করুন।';
+    return;
+  }
+  if (isAdmin) {
+    box.className = 'my-plan active';
+    box.textContent = '🛡️ আপনি অ্যাডমিন, আপনার জন্য কোনো মেয়াদ নেই।';
+    return;
+  }
+  if (isActive(member)) {
+    box.className = 'my-plan active';
+    box.textContent = `✅ বর্তমান প্ল্যান: ${member.plan || '—'} | মেয়াদ: ${fmtDate(member.expiresAt)} পর্যন্ত (${daysLeft(member.expiresAt)} দিন বাকি)`;
+    return;
+  }
+  if (member && member.status === 'approved') {
+    box.className = 'my-plan expired';
+    box.textContent = `⌛ আপনার প্ল্যানের মেয়াদ শেষ হয়েছে (${member.expiresAt ? fmtDate(member.expiresAt) : '—'})। নিচ থেকে নতুন প্ল্যান বেছে নিন।`;
+    return;
+  }
+  if (member && member.status === 'rejected') {
+    box.className = 'my-plan expired';
+    box.textContent = '⛔ আপনার অ্যাকাউন্ট অনুমোদিত নয়। অ্যাডমিনের সাথে যোগাযোগ করুন।';
+    return;
+  }
+  box.textContent = 'এখনো কোনো প্ল্যান চালু নেই। নিচ থেকে একটি প্ল্যান বেছে টাকা পাঠান।';
 }
 
 // ---------- ক্লাউড থেকে ইউজারের নিজের ডাটা নামানো ----------
@@ -139,23 +199,29 @@ async function ensureMember(user) {
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    await setDoc(ref, {
+    const base = {
       name: user.displayName || 'ইউজার',
       email: user.email || '',
       photo: user.photoURL || '',
-      status: isAdmin ? 'approved' : 'pending',
       createdAt: serverTimestamp()
-    });
-  } else if (isAdmin && snap.data().status !== 'approved') {
-    await updateDoc(ref, { status: 'approved' }); // অ্যাডমিন নিজেকে কখনো আটকাবে না
+    };
+    await setDoc(ref, isAdmin
+      ? { ...base, status: 'approved', plan: 'Admin', expiresAt: FAR_FUTURE }
+      : { ...base, status: 'pending' });
+  } else if (isAdmin) {
+    const d = snap.data();
+    if (d.status !== 'approved' || Number(d.expiresAt || 0) < FAR_FUTURE) {
+      await updateDoc(ref, { status: 'approved', plan: 'Admin', expiresAt: FAR_FUTURE }); // অ্যাডমিন কখনো আটকাবে না
+    }
   }
 }
 
-// ---------- অ্যাপ্রুভাল স্ট্যাটাস বদলালে ----------
-async function applyStatus(user, status) {
-  memberStatus = status;
+// ---------- সদস্যের অবস্থা বদলালে (অ্যাপ্রুভ, মেয়াদ শেষ ইত্যাদি) ----------
+async function applyMember(user, data) {
+  member = data;
+  const status = data?.status || 'pending';
 
-  if (status === 'approved') {
+  if (isActive(data)) {
     if (stateLoadedFor !== user.uid) {
       await pullState(user);
       stateLoadedFor = user.uid;
@@ -165,16 +231,25 @@ async function applyStatus(user, status) {
   } else {
     setAllowed(false);
     window.setCurrentUser?.(user.uid); // লগইন-ছাড়া পুরোনো ডাটা যেন না দেখায়
-    showGate(status === 'rejected' ? 'rejected' : 'pending');
+    showGate(status === 'approved' ? 'expired' : status === 'rejected' ? 'rejected' : 'pending');
   }
+
+  renderMyPlan();
 }
+
+// টাইপ করতে করতে মেয়াদ শেষ হলে নিজে থেকেই বন্ধ হবে (প্রতি ১৫ সেকেন্ডে যাচাই)
+setInterval(() => {
+  if (currentUser && window.typingAllowed && !isActive(member)) {
+    applyMember(currentUser, member);
+  }
+}, 15000);
 
 // ---------- লগইন অবস্থার পরিবর্তন ----------
 onAuthStateChanged(auth, async (user) => {
   if (unsubMember) { unsubMember(); unsubMember = null; }
 
   currentUser = user;
-  memberStatus = null;
+  member = null;
   stateLoadedFor = null;
   setAllowed(false);
 
@@ -189,6 +264,7 @@ onAuthStateChanged(auth, async (user) => {
     $('navAdmin').style.display = 'none';
     window.setCurrentUser?.(null);
     showGate('loggedout');
+    renderMyPlan();
     if ($('leaderboardPage').style.display === 'block') loadLeaderboard();
     return;
   }
@@ -209,10 +285,10 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // রিয়েল-টাইম: অ্যাডমিন অ্যাপ্রুভ করলেই ইউজারের পেজ নিজে থেকে খুলে যাবে
+  // রিয়েল-টাইম: অ্যাডমিন প্ল্যান চালু করলেই ইউজারের পেজ নিজে থেকে খুলে যাবে
   unsubMember = onSnapshot(
     memberRef(user.uid),
-    (snap) => applyStatus(user, snap.data()?.status || 'pending'),
+    (snap) => applyMember(user, snap.data() || { status: 'pending' }),
     (err) => { console.error(err); showGate('error'); }
   );
 
@@ -221,7 +297,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // ---------- টেস্ট শেষে ডাটা সেভ (main.js এটা ডাকে) ----------
 export async function saveResult({ wpm, accuracy, snapshot }) {
-  if (!currentUser || memberStatus !== 'approved') return;
+  if (!currentUser || !isActive(member)) return;
   const uid = currentUser.uid;
 
   // ১) ইউজারের নিজের প্রাইভেট ডাটা
@@ -297,11 +373,29 @@ async function loadLeaderboard() {
 }
 
 // ---------- অ্যাডমিন প্যানেল ----------
-const STATUS_LABEL = { pending: 'Pending', approved: 'Approved', rejected: 'Rejected' };
+const STATUS_LABEL = { pending: 'Pending', approved: 'Active', expired: 'Expired', rejected: 'Rejected' };
 
-async function setMemberStatus(uid, status) {
+// প্ল্যান চালু বা মেয়াদ বাড়ানো। মেয়াদ থাকলে বাকি সময়ের ওপর যোগ হয়, শেষ হলে আজ থেকে গোনা হয়।
+async function approveWithPlan(m, planName) {
+  const months = PLANS[planName];
+  if (!months) return;
+
+  const base = isActive(m) ? Number(m.expiresAt) : Date.now();
+  const d = new Date(base);
+  d.setMonth(d.getMonth() + months);
+
   try {
-    await updateDoc(memberRef(uid), { status });
+    await updateDoc(memberRef(m.id), { status: 'approved', plan: planName, expiresAt: d.getTime() });
+    loadAdmin();
+  } catch (e) {
+    console.error(e);
+    alert('পরিবর্তন করা যায়নি: ' + (e.code || e.message));
+  }
+}
+
+async function rejectMember(uid) {
+  try {
+    await updateDoc(memberRef(uid), { status: 'rejected' });
     loadAdmin();
   } catch (e) {
     console.error(e);
@@ -318,15 +412,18 @@ async function loadAdmin() {
     const snap = await getDocs(query(collection(db, 'members'), limit(500)));
     if (snap.empty) { box.textContent = 'এখনো কেউ লগইন করেনি।'; return; }
 
-    const rank = { pending: 0, rejected: 1, approved: 2 };
+    const rank = { pending: 0, expired: 1, rejected: 2, approved: 3 };
     const time = (m) => (m.createdAt && m.createdAt.seconds) || 0;
     const members = snap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
-      .sort((a, b) => (rank[a.status] ?? 3) - (rank[b.status] ?? 3) || time(b) - time(a)); // Pending আগে, নতুন আগে
+      .sort((a, b) =>
+        (rank[effectiveStatus(a)] ?? 4) - (rank[effectiveStatus(b)] ?? 4) || time(b) - time(a)
+      ); // Pending ও Expired আগে, নতুন আগে
 
     const frag = document.createDocumentFragment();
 
     members.forEach((m) => {
+      const eff = effectiveStatus(m);
       const row = document.createElement('div');
       row.className = 'admin-row';
 
@@ -338,26 +435,43 @@ async function loadAdmin() {
 
       const status = document.createElement('span');
       const badge = document.createElement('span');
-      badge.className = 'badge ' + (m.status || 'pending');
-      badge.textContent = STATUS_LABEL[m.status] || 'Pending';
+      badge.className = 'badge ' + eff;
+      badge.textContent = STATUS_LABEL[eff] || 'Pending';
       status.appendChild(badge);
+      if (m.plan && m.expiresAt) {
+        const sub = document.createElement('span');
+        sub.className = 'admin-sub';
+        sub.textContent = m.id === currentUser.uid
+          ? 'Admin'
+          : `${m.plan} · ${fmtDate(m.expiresAt)} পর্যন্ত` + (isActive(m) ? ` (${daysLeft(m.expiresAt)} দিন বাকি)` : '');
+        status.appendChild(sub);
+      }
 
       const actions = document.createElement('div');
       actions.className = 'admin-actions';
 
       if (m.id !== currentUser.uid) { // অ্যাডমিন নিজের অ্যাকাউন্ট বদলাতে পারবে না
-        if (m.status !== 'approved') {
-          const ok = document.createElement('button');
-          ok.className = 'btn-ok';
-          ok.textContent = '✔ Approve';
-          ok.addEventListener('click', () => setMemberStatus(m.id, 'approved'));
-          actions.appendChild(ok);
-        }
+        const select = document.createElement('select');
+        Object.keys(PLANS).forEach((p) => {
+          const o = document.createElement('option');
+          o.value = p;
+          o.textContent = p;
+          if (p === m.plan) o.selected = true;
+          select.appendChild(o);
+        });
+
+        const ok = document.createElement('button');
+        ok.className = 'btn-ok';
+        ok.textContent = eff === 'approved' ? '➕ Extend' : '✔ Approve';
+        ok.addEventListener('click', () => approveWithPlan(m, select.value));
+
+        actions.append(select, ok);
+
         if (m.status !== 'rejected') {
           const no = document.createElement('button');
           no.className = 'btn-no';
-          no.textContent = m.status === 'approved' ? '⛔ Revoke' : '✖ Reject';
-          no.addEventListener('click', () => setMemberStatus(m.id, 'rejected'));
+          no.textContent = eff === 'approved' ? '⛔ Revoke' : '✖ Reject';
+          no.addEventListener('click', () => rejectMember(m.id));
           actions.appendChild(no);
         }
       }
@@ -376,7 +490,7 @@ async function loadAdmin() {
 // ---------- অতিরিক্ত পেজ (লিডারবোর্ড, অ্যাডমিন) দেখানো ----------
 const extraPages = ['leaderboardPage', 'adminPage'];
 const extraNavs = ['navLeaderboard', 'navAdmin'];
-const mainNavs = ['navHome', 'navPractice', 'navDashboard', 'navHistory'];
+const mainNavs = ['navHome', 'navSubscription', 'navPractice', 'navDashboard', 'navHistory'];
 
 function showExtra(pageId, navId, loader) {
   document.querySelectorAll('.page-section').forEach((s) => (s.style.display = 'none'));
@@ -401,5 +515,8 @@ mainNavs.forEach((id) => {
   $(id).addEventListener('click', () => {
     extraPages.forEach((p) => ($(p).style.display = 'none'));
     extraNavs.forEach((n) => $(n).classList.remove('active'));
+    if (id === 'navSubscription') renderMyPlan();
   });
 });
+
+renderMyPlan();
