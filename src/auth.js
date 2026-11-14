@@ -104,6 +104,111 @@ function showGate(state) {
   }
 }
 
+// ---------- ফ্রি ট্রায়াল (প্রিমিয়ামের আগে প্রতি টাইপ অপশনে ২টি টেস্ট) ----------
+const FREE_LIMIT = 2;
+let trial = { en: 0, bn: 0 }; // কোন অপশনে কয়টি ফ্রি টেস্ট ব্যবহার হয়েছে
+let trialLoaded = false;
+let wasActive = false;
+
+const trialRef = (uid) => doc(db, 'trials', uid);
+const currentLang = () => ($('language') && $('language').value === 'bn' ? 'bn' : 'en');
+const trialLeft = (k) => Math.max(0, FREE_LIMIT - (trial[k] || 0));
+const isPendingUser = () => !!member && (member.status || 'pending') === 'pending';
+
+function setTrialMode(on) {
+  document.body.classList.toggle('trial', on); // গেট থাকলেও ভাষা বদলের অপশনগুলো দেখা যাবে
+}
+
+async function loadTrial(user) {
+  try {
+    const snap = await getDoc(trialRef(user.uid));
+    const d = snap.exists() ? snap.data() : {};
+    trial = { en: Number(d.en || 0), bn: Number(d.bn || 0) };
+  } catch (e) {
+    console.error('ফ্রি ট্রায়ালের তথ্য আনা যায়নি:', e);
+    trial = { en: FREE_LIMIT, bn: FREE_LIMIT }; // সমস্যা হলে ফ্রি টেস্ট বন্ধ রাখা হয়
+  }
+  trialLoaded = true;
+}
+
+function updateTrialNote() {
+  const el = $('trialNote');
+  if (!el) return;
+
+  const show = !!currentUser && trialLoaded && isPendingUser() && !isActive(member);
+  el.style.display = show ? '' : 'none';
+  if (!show) return;
+
+  $('trialText').textContent =
+    `🎁 ফ্রি ট্রায়াল বাকি: English ${trialLeft('en')}/${FREE_LIMIT} · বাংলা ${trialLeft('bn')}/${FREE_LIMIT}`;
+}
+
+// টাইপিং এরিয়া দেখাবে নাকি গেট পেজ, সেটা এখানে ঠিক হয়
+function refreshAccess() {
+  if (!currentUser) {
+    setAllowed(false);
+    setTrialMode(false);
+    showGate('loggedout');
+    updateTrialNote();
+    return;
+  }
+  if (!member || !trialLoaded) return; // এখনো লোড হচ্ছে
+
+  const status = member.status || 'pending';
+  wasActive = isActive(member);
+
+  if (wasActive) {
+    setAllowed(true);
+    setTrialMode(false);
+  } else if (status === 'pending') {
+    const anyLeft = trialLeft('en') > 0 || trialLeft('bn') > 0;
+    setTrialMode(anyLeft);
+    if (trialLeft(currentLang()) > 0) {
+      setAllowed(true);
+    } else {
+      setAllowed(false);
+      showGate('pending'); // এই অপশনের ফ্রি টেস্ট শেষ, আগের গেট পেজই দেখাবে
+    }
+  } else {
+    setAllowed(false);
+    setTrialMode(false);
+    showGate(status === 'approved' ? 'expired' : 'rejected');
+  }
+
+  updateTrialNote();
+}
+
+// নতুন টেস্ট শুরু করা যাবে কি না (main.js এটা জিজ্ঞেস করে)
+window.canStartTest = () => {
+  if (!currentUser || !member || !trialLoaded) return false;
+  if (isActive(member)) return true;
+  return isPendingUser() && trialLeft(currentLang()) > 0;
+};
+
+// টেস্ট শুরু হলে ফ্রি ট্রায়ালের একটা গণনা কমে (প্রিমিয়ামের জন্য গোনা হয় না)
+window.onTestStart = async (lang) => {
+  if (!currentUser || !isPendingUser() || isActive(member)) return;
+
+  const k = lang === 'bn' ? 'bn' : 'en';
+  trial[k] = Math.min(FREE_LIMIT, (trial[k] || 0) + 1);
+  updateTrialNote(); // এখানে এরিয়া লুকানো হয় না, চলমান টেস্ট শেষ করা যাবে
+
+  try {
+    await setDoc(trialRef(currentUser.uid), {
+      en: trial.en,
+      bn: trial.bn,
+      updatedAt: serverTimestamp()
+    });
+  } catch (e) {
+    console.error('ফ্রি ট্রায়ালের গণনা সেভ হয়নি:', e);
+  }
+};
+
+window.refreshAccess = refreshAccess;
+
+$('language').addEventListener('change', () => refreshAccess());
+$('trialUpgradeBtn').addEventListener('click', () => $('navSubscription').click());
+
 // ---------- Subscription পেজের "আপনার প্ল্যান" বক্স ----------
 function renderMyPlan() {
   const box = $('myPlanBox');
@@ -172,7 +277,22 @@ async function pullState(user) {
       return;
     }
 
-    // প্রথমবার: এই ব্রাউজারে লগইন ছাড়া যে ডাটা জমেছিল, একবার অ্যাকাউন্টে তুলে নেওয়া হয়
+    // ক্লাউডে কিছু নেই। আগে দেখা হয়, ফ্রি ট্রায়ালে দেওয়া টেস্ট এই ডিভাইসে জমা আছে কি না
+    const localTotal = Number(localStorage.getItem(`totalTests:${uid}`) || 0);
+
+    if (localTotal > 0) {
+      await setDoc(stateRef(uid), {
+        history: localStorage.getItem(`history:${uid}`) || '[]',
+        dailyStats: localStorage.getItem(`dailyStats:${uid}`) || '{}',
+        bestWpm: Number(localStorage.getItem(`bestWpm:${uid}`) || 0),
+        lowestWpm: Number(localStorage.getItem(`lowestWpm:${uid}`) || 0),
+        totalTests: localTotal,
+        updatedAt: serverTimestamp()
+      });
+      return;
+    }
+
+    // তারপর: লগইন ছাড়া অবস্থায় এই ব্রাউজারে জমা হওয়া পুরোনো ডাটা, একবার অ্যাকাউন্টে তুলে নেওয়া হয়
     const anon = readAnonymous();
 
     if (!localStorage.getItem('migratedAnon') && anon.totalTests > 0) {
@@ -220,7 +340,6 @@ async function ensureMember(user) {
 // ---------- সদস্যের অবস্থা বদলালে (অ্যাপ্রুভ, মেয়াদ শেষ ইত্যাদি) ----------
 async function applyMember(user, data) {
   member = data;
-  const status = data?.status || 'pending';
 
   if (isActive(data)) {
     if (stateLoadedFor !== user.uid) {
@@ -228,20 +347,19 @@ async function applyMember(user, data) {
       stateLoadedFor = user.uid;
       window.setCurrentUser?.(user.uid);
     }
-    setAllowed(true);
   } else {
-    setAllowed(false);
     window.setCurrentUser?.(user.uid); // লগইন-ছাড়া পুরোনো ডাটা যেন না দেখায়
-    showGate(status === 'approved' ? 'expired' : status === 'rejected' ? 'rejected' : 'pending');
   }
 
+  refreshAccess();
   renderMyPlan();
 }
 
-// টাইপ করতে করতে মেয়াদ শেষ হলে নিজে থেকেই বন্ধ হবে (প্রতি ১৫ সেকেন্ডে যাচাই)
+// প্রিমিয়ামের মেয়াদ টাইপ করার মাঝখানে শেষ হলে নিজে থেকেই ধরা হয় (প্রতি ১৫ সেকেন্ডে যাচাই)
 setInterval(() => {
-  if (currentUser && window.typingAllowed && !isActive(member)) {
-    applyMember(currentUser, member);
+  if (currentUser && member && wasActive && !isActive(member)) {
+    refreshAccess();
+    renderMyPlan();
   }
 }, 15000);
 
@@ -252,7 +370,11 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   member = null;
   stateLoadedFor = null;
+  trial = { en: 0, bn: 0 };
+  trialLoaded = false;
+  wasActive = false;
   setAllowed(false);
+  setTrialMode(false);
 
   const photo = $('userPhoto');
 
@@ -264,7 +386,7 @@ onAuthStateChanged(auth, async (user) => {
     $('logoutBtn').style.display = 'none';
     $('navAdmin').style.display = 'none';
     window.setCurrentUser?.(null);
-    showGate('loggedout');
+    refreshAccess();
     renderMyPlan();
     loadMyPayments();
     if ($('leaderboardPage').style.display === 'block') loadLeaderboard();
@@ -287,6 +409,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  await loadTrial(user);
   loadMyPayments();
 
   // রিয়েল-টাইম: অ্যাডমিন প্ল্যান চালু করলেই ইউজারের পেজ নিজে থেকে খুলে যাবে
