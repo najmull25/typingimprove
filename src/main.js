@@ -263,6 +263,8 @@ function resetTest() {
   resetResultDisplay();
 
   showPassage();
+
+  window.refreshAccess?.(); // রিসেটের পর আবার যাচাই: টাইপিং এরিয়া নাকি গেট পেজ
 }
 
 // ================= UPDATE STATISTICS =================
@@ -826,7 +828,14 @@ function tick() {
 }
 
 function startTest() {
-  if (!window.typingAllowed) return; // লগইন ও অ্যাপ্রুভ ছাড়া টেস্ট শুরু হবে না
+  // নতুন টেস্ট শুরু হতে যাচ্ছে: প্রিমিয়াম বা ফ্রি ট্রায়াল না থাকলে শুরু হবে না
+  if (!started || finished) {
+    if (!window.canStartTest?.()) {
+      window.refreshAccess?.();
+
+      return;
+    }
+  }
 
   if (finished) {
     resetTest();
@@ -837,6 +846,8 @@ function startTest() {
   started = true;
 
   startTime = Date.now();
+
+  window.onTestStart?.($('language').value); // ফ্রি ট্রায়ালের একটা গণনা কমবে
 
   totalSeconds = Number($('duration').value) * 60;
 
@@ -862,15 +873,17 @@ $('startBtn').addEventListener('click', () => {
 const typingBox = $('typingInput');
 
 typingBox.addEventListener('input', () => {
-  if (!window.typingAllowed) {
-    typingBox.value = '';
-    return;
-  }
-
   if (finished) return;
 
   // প্রথম অক্ষর টাইপ করলেই টাইমার শুরু হবে
-  if (!started) startTest();
+  if (!started) {
+    startTest();
+
+    if (!started) {
+      typingBox.value = ''; // অনুমতি নেই, টাইপ করা অক্ষর মুছে ফেলা হয়
+      return;
+    }
+  }
 
   updateStats();
 
