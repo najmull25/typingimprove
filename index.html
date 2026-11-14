@@ -113,7 +113,8 @@ body.dark .modal { background:#1e293b; color:#f8fafc; }
 body.dark .method-opt .m { border-color:#334155; }
 .method-opt input:checked + .m { border-color:#16a34a; background:rgba(22,163,74,.1); }
 .method-opt input:focus-visible + .m { outline:2px solid #3b82f6; }
-.method-opt svg { width:28px; height:28px; flex:none; }
+.method-opt svg { width:32px; height:32px; flex:none; }
+.method-opt img { width:32px; height:32px; flex:none; object-fit:contain; background:#fff; border-radius:8px; border:1px solid #e2e8f0; }
 .pay-msg { min-height:1.4em; margin:0 0 10px; font-weight:600; color:#dc2626; }
 .pay-msg.ok { color:#16a34a; }
 .my-pay-row { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 4px; border-bottom:1px solid #e2e8f0; }
@@ -234,7 +235,7 @@ body.dark .drawer-header { border-bottom-color:#334155; }
           <h3 id="gateTitle">লোড হচ্ছে...</h3>
           <p id="gateText"></p>
           <button type="button" id="gateLoginBtn" style="display: none">🔐 Google দিয়ে লগইন</button>
-          <button type="button" id="gatePlanBtn" style="display: none">💎 প্ল্যান দেখুন</button>
+          <button type="button" id="gatePlanBtn" style="display: none">💎 Upgrade your plan</button>
         </div>
 
         <div id="practiceBody">
@@ -427,28 +428,28 @@ body.dark .drawer-header { border-bottom-color:#334155; }
           <label class="method-opt">
             <input type="radio" name="payMethod" value="Bkash" />
             <span class="m">
-              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#E2136E"/><text x="20" y="28" text-anchor="middle" font-size="24" font-weight="800" fill="#fff" font-family="Arial, sans-serif">b</text></svg>
+              <img src="img/bkash.png" alt="bKash" width="32" height="32" />
               Bkash
             </span>
           </label>
           <label class="method-opt">
             <input type="radio" name="payMethod" value="Nagad" />
             <span class="m">
-              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#F6921E"/><text x="20" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#fff" font-family="Arial, sans-serif">N</text></svg>
+              <img src="img/nagad.png" alt="Nagad" width="32" height="32" />
               Nagad
             </span>
           </label>
           <label class="method-opt">
             <input type="radio" name="payMethod" value="Rocket" />
             <span class="m">
-              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#8C3494"/><text x="20" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#fff" font-family="Arial, sans-serif">R</text></svg>
+              <img src="img/rocket.png" alt="Rocket" width="32" height="32" />
               Rocket
             </span>
           </label>
           <label class="method-opt">
             <input type="radio" name="payMethod" value="Upay" />
             <span class="m">
-              <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#1C4FA0"/><text x="20" y="28" text-anchor="middle" font-size="22" font-weight="800" fill="#FFC20E" font-family="Arial, sans-serif">U</text></svg>
+              <img src="img/upay.png" alt="Upay" width="32" height="32" />
               Upay
             </span>
           </label>
