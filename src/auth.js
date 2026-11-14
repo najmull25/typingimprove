@@ -16,7 +16,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 // ★★★ এখানে আপনার নিজের Gmail বসান। Firestore Rules-এও ঠিক একই ইমেইল দিতে হবে। ★★★
-const ADMIN_EMAIL = 'YOUR_EMAIL@gmail.com';
+const ADMIN_EMAIL = 'najmul0174.bd@gmail.com';
 
 // প্ল্যানের নাম → কত মাস
 const PLANS = { '1 Month': 1, '2 Months': 2, '6 Months': 6, '1 Year': 12 };
