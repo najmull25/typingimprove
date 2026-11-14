@@ -411,6 +411,16 @@ function renderChart(history) {
 // ================= DASHBOARD =================
 
 function renderDashboard() {
+  // নতুন Dashboard ও History পেজ (src/dashboard, src/history) এখান থেকে আপডেট হয়
+  const snapshot = getSnapshot();
+
+  window.renderDashboardPage?.(snapshot);
+
+  window.renderHistoryPage?.(snapshot);
+
+  // নতুন Dashboard চালু থাকলে নিচের পুরোনো অংশ লাগে না (শুধু ব্যাকআপ হিসেবে রাখা)
+  if (!$('bestWpm')) return;
+
   $('bestWpm').textContent = ls.get('bestWpm') || 0;
 
   $('lowestWpm').textContent = ls.get('lowestWpm') || 0;
@@ -426,9 +436,6 @@ function renderDashboard() {
   ).length;
 
   renderChart(history);
-
-  // নতুন History পেজ (src/history/history.js) এখান থেকে আপডেট হয়
-  window.renderHistoryPage?.(getSnapshot());
 }
 
 // ================= HISTORY (প্রতিদিনের হিসাব ও গ্রাফ) =================
