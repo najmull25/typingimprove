@@ -427,7 +427,8 @@ function renderDashboard() {
 
   renderChart(history);
 
-  renderHistory();
+  // নতুন History পেজ (src/history/history.js) এখান থেকে আপডেট হয়
+  window.renderHistoryPage?.(getSnapshot());
 }
 
 // ================= HISTORY (প্রতিদিনের হিসাব ও গ্রাফ) =================
@@ -734,6 +735,12 @@ function finishTest() {
   history.unshift({
     date: new Date().toLocaleString(),
 
+    ts: Date.now(), // History পেজের তারিখ ফিল্টার ও গ্রাফের জন্য সঠিক সময়
+
+    passage: isCustomMode
+      ? 'Custom Practice'
+      : $('passageSelect').selectedOptions[0]?.textContent || '',
+
     wpm,
 
     wordWpm: Number($('wordWpm').textContent),
@@ -757,7 +764,7 @@ function finishTest() {
     lang: $('language').value,
   });
 
-  saveJSON('history', history.slice(0, 20));
+  saveJSON('history', history.slice(0, 300));
 
   // প্রতিদিনের হিসাব: গড় ও সর্বোচ্চ গতি (ইংরেজি ও বাংলা আলাদা)
   if (wpm > 0) {
