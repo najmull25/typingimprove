@@ -59,6 +59,12 @@ button:disabled { opacity:.6; cursor:not-allowed; }
 #customPracticeBtn.activeMode { background:linear-gradient(135deg,#ef4444,#dc2626); box-shadow:0 2px 8px rgba(239,68,68,.2); }
 #passageManagerBtn { background:linear-gradient(135deg,#6366f1,#4f46e5); }
 
+/* ===== হাইলাইট চালু/বন্ধ বাটন ===== */
+#highlightBtn.hl-on { background:linear-gradient(135deg,#b91c1c,#7f1d1d); box-shadow:0 2px 8px rgba(185,28,28,.25); }
+#highlightBtn.hl-off { background:linear-gradient(135deg,#22c55e,#15803d); box-shadow:0 2px 8px rgba(22,163,74,.25); }
+/* হাইলাইট বন্ধ থাকলে সবুজ/লাল/কার্সরের রং থাকবে না, লেখা সাধারণ দেখাবে */
+.passage.no-hl span.ok, .passage.no-hl span.bad, .passage.no-hl span.cur { color:inherit !important; background:none !important; }
+
 /* ===== লগইন (Firebase) ===== */
 .topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .auth-box { display:flex; align-items:center; gap:8px; }
@@ -269,6 +275,7 @@ body.dark .drawer-header { border-bottom-color:#334155; }
           <select id="passageSelect"><option value="0">Passage 1</option></select>
           <button id="customPracticeBtn">Customize Practice</button>
           <button type="button" id="passageManagerBtn">📁 My Passages</button>
+          <button type="button" id="highlightBtn" class="hl-on">Hide Highlight</button>
         </div>
 
         <div id="normalPassageSection"><div id="passage" class="passage"></div></div>
