@@ -68,6 +68,26 @@ button:disabled { opacity:.6; cursor:not-allowed; }
 body.dark #loginBtn { background:#1e293b; color:#f8fafc; border-color:#334155; }
 #logoutBtn { background:#64748b; padding:8px 14px; }
 
+/* ===== সাবস্ক্রিপশন ===== */
+.plan-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:20px; }
+.plan-card { display:block; width:100%; text-align:center; padding:26px 14px; background:#fff; color:#1e293b; border:2px solid #e2e8f0; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.05); cursor:pointer; transition:.2s; }
+body.dark .plan-card { background:#1e293b; color:#f8fafc; border-color:#334155; }
+.plan-card:hover:not(:disabled) { border-color:#3b82f6; transform:translateY(-3px); filter:none; }
+.plan-card.selected { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+.plan-card .plan-name { display:block; font-size:1.1rem; font-weight:700; color:#64748b; }
+.plan-card .plan-price { display:block; margin-top:10px; font-size:2.2rem; font-weight:800; color:#3b82f6; }
+.plan-card .plan-price small { font-size:1rem; font-weight:700; color:#64748b; }
+.plan-card .plan-pick { display:block; margin-top:12px; font-size:.9rem; color:#64748b; }
+.pay-box { display:none; margin-top:24px; background:#fff; padding:24px 20px; border-radius:12px; border-left:5px solid #16a34a; box-shadow:0 2px 4px rgba(0,0,0,.05); }
+body.dark .pay-box { background:#1e293b; }
+.pay-box h3 { margin:0 0 6px; }
+.pay-box .pay-plan { margin:0 0 16px; font-weight:700; color:#16a34a; }
+.pay-number { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:6px 0 10px; }
+.pay-number strong { font-size:1.6rem; letter-spacing:1px; }
+.pay-number button { padding:6px 14px; font-size:.9rem; background:#64748b; }
+.pay-note { margin:14px 0 0; color:#64748b; font-size:.95rem; line-height:1.7; }
+body.dark .pay-note { color:#94a3b8; }
+
 /* ===== লগইন বাধ্যতামূলক (Access Gate) ===== */
 body:not(.approved) #practiceBody { display:none; }
 body.approved #accessGate { display:none; }
@@ -78,7 +98,7 @@ body.dark .gate { background:#1e293b; }
 body.dark .gate p { color:#94a3b8; }
 
 /* ===== অ্যাডমিন প্যানেল ===== */
-.admin-row { display:grid; grid-template-columns:1.2fr 1.4fr .8fr auto; gap:8px; align-items:center; padding:10px 6px; border-bottom:1px solid #e2e8f0; }
+.admin-row { display:grid; grid-template-columns:1.1fr 1.3fr 1.2fr auto; gap:8px; align-items:center; padding:10px 6px; border-bottom:1px solid #e2e8f0; }
 body.dark .admin-row { border-bottom-color:#334155; }
 .admin-row small { color:#64748b; }
 .badge { display:inline-block; padding:2px 10px; border-radius:99px; font-size:.8rem; font-weight:700; color:#fff; }
@@ -88,6 +108,13 @@ body.dark .admin-row { border-bottom-color:#334155; }
 .admin-actions { display:flex; gap:6px; flex-wrap:wrap; }
 .admin-actions button { padding:6px 12px; font-size:.85rem; }
 .btn-ok { background:#16a34a; }
+.badge.expired { background:#64748b; }
+.admin-actions select { padding:5px 8px; font-size:.85rem; }
+.admin-sub { display:block; margin-top:4px; color:#64748b; font-size:.82rem; }
+.my-plan { background:#fff; padding:14px 18px; border-radius:8px; margin-top:14px; border-left:5px solid #94a3b8; box-shadow:0 2px 4px rgba(0,0,0,.05); line-height:1.7; }
+body.dark .my-plan { background:#1e293b; }
+.my-plan.active { border-left-color:#16a34a; }
+.my-plan.expired { border-left-color:#dc2626; }
 .btn-no { background:#dc2626; }
 @media (max-width:720px) { .admin-row { grid-template-columns:1fr; } }
 
@@ -134,6 +161,7 @@ body.dark .drawer-header { border-bottom-color:#334155; }
     </div>
     <nav class="side-nav">
       <a href="#" id="navHome" class="active"><span>🏠</span> Home</a>
+      <a href="#" id="navSubscription"><span>💎</span> Subscription</a>
       <a href="#" id="navPractice"><span>⚡</span> Practice</a>
       <a href="#" id="navDashboard"><span>📊</span> Dashboard</a>
       <a href="#" id="navHistory"><span>🕘</span> History</a>
@@ -175,6 +203,7 @@ body.dark .drawer-header { border-bottom-color:#334155; }
           <h3 id="gateTitle">লোড হচ্ছে...</h3>
           <p id="gateText"></p>
           <button type="button" id="gateLoginBtn" style="display: none">🔐 Google দিয়ে লগইন</button>
+          <button type="button" id="gatePlanBtn" style="display: none">💎 প্ল্যান দেখুন</button>
         </div>
 
         <div id="practiceBody">
@@ -249,6 +278,52 @@ body.dark .drawer-header { border-bottom-color:#334155; }
       <section class="page-section" id="historyPage">
         <h2>Typing History</h2>
         <div id="historyList" class="history-box">এখনো কোনো পরীক্ষা সম্পন্ন হয়নি।</div>
+      </section>
+
+      <!-- সাবস্ক্রিপশন পেজ -->
+      <section class="page-section" id="subscriptionPage">
+        <h2>💎 Upgrade your plan</h2>
+        <!-- ইউজারের বর্তমান প্ল্যান ও মেয়াদ (লেখা src/auth.js বসায়) -->
+        <div id="myPlanBox" class="my-plan">লোড হচ্ছে...</div>
+
+        <p class="result-note">আপনার পছন্দের প্ল্যানে ক্লিক করুন।</p>
+
+        <div class="plan-grid">
+          <button type="button" class="plan-card" data-name="1 Month" data-price="40">
+            <span class="plan-name">1 Month</span>
+            <span class="plan-price">40 <small>TK</small></span>
+            <span class="plan-pick">Select plan</span>
+          </button>
+          <button type="button" class="plan-card" data-name="2 Months" data-price="70">
+            <span class="plan-name">2 Months</span>
+            <span class="plan-price">70 <small>TK</small></span>
+            <span class="plan-pick">Select plan</span>
+          </button>
+          <button type="button" class="plan-card" data-name="6 Months" data-price="200">
+            <span class="plan-name">6 Months</span>
+            <span class="plan-price">200 <small>TK</small></span>
+            <span class="plan-pick">Select plan</span>
+          </button>
+          <button type="button" class="plan-card" data-name="1 Year" data-price="300">
+            <span class="plan-name">1 Year</span>
+            <span class="plan-price">300 <small>TK</small></span>
+            <span class="plan-pick">Select plan</span>
+          </button>
+        </div>
+
+        <!-- প্ল্যানে ক্লিক করলে এই বক্স দেখাবে -->
+        <div id="paymentBox" class="pay-box">
+          <h3>Payment</h3>
+          <p class="pay-plan" id="selectedPlan"></p>
+          <div>Send Money To</div>
+          <div class="pay-number">
+            <strong>01743775043</strong>
+            <button type="button" id="copyNumberBtn">Copy</button>
+          </div>
+          <div>Bkash / Nagad / Rocket / Upay — All Method</div>
+          <p class="pay-note">*Note: If any problem contact 01743775043 (WhatsApp)</p>
+          <p class="pay-note">টাকা পাঠানোর পর WhatsApp-এ আপনার Gmail ও প্ল্যানের নাম জানান। যাচাই করে অ্যাডমিন প্ল্যান চালু করে দেবেন।</p>
+        </div>
       </section>
 
       <!-- ৫. নতুন: লিডারবোর্ড (ভেতরের তথ্য src/auth.js ভরে দেয়) -->
