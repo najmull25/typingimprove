@@ -86,6 +86,8 @@ body.dark .pay-box { background:#1e293b; }
 .pay-number { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:6px 0 10px; }
 .pay-number strong { font-size:1.6rem; letter-spacing:1px; }
 .pay-number button { padding:6px 14px; font-size:.9rem; background:#64748b; }
+.pay-logos { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin:10px 0 4px; }
+.pay-logos img { height:48px; width:auto; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:6px 12px; }
 .pay-note { margin:14px 0 0; color:#64748b; font-size:.95rem; line-height:1.7; }
 body.dark .pay-note { color:#94a3b8; }
 
@@ -372,7 +374,12 @@ body.dark .drawer-header { border-bottom-color:#334155; }
             <strong>01743775043</strong>
             <button type="button" id="copyNumberBtn">Copy</button>
           </div>
-          <div>Bkash / Nagad / Rocket / Upay — All Method</div>
+          <div class="pay-logos" aria-label="Bkash, Nagad, Rocket, Upay - All Method">
+            <img src="img/bkash-logo.png" alt="Bkash" title="Bkash" />
+            <img src="img/nagad-logo.png" alt="Nagad" title="Nagad" />
+            <img src="img/rocket-logo.png" alt="Rocket" title="Rocket" />
+            <img src="img/upay-logo.png" alt="Upay" title="Upay" />
+          </div>
           <p class="pay-note">*Note: If any problem contact 01743775043 (WhatsApp)</p>
           <p class="pay-note">টাকা পাঠানোর পর প্ল্যানের নিচের সবুজ <strong>Confirm</strong> বাটনে চেপে ফর্মটি পূরণ করুন। যাচাই করে অ্যাডমিন প্ল্যান চালু করে দেবেন।</p>
         </div>
