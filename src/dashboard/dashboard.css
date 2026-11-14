@@ -1,0 +1,140 @@
+/* =====================================================================
+   src/dashboard/dashboard.css : Dashboard পেজের নতুন ডিজাইন
+   সব ক্লাস td- দিয়ে শুরু, তাই সাইটের অন্য স্টাইলের সাথে মিশবে না।
+   ডার্ক মোড: সাইটের Dark Mode বাটন body-তে "dark" ক্লাস বসায়, সেটাই ধরা হয়েছে।
+   ===================================================================== */
+
+.td-wrap { color:#10234a; font-family:inherit; }
+body.dark .td-wrap { color:#edf4ff; }
+
+/* ---------- পেজের শিরোনাম ---------- */
+.td-title { margin:0 0 6px; font-size:clamp(24px, 2.8vw, 34px); font-weight:800; line-height:1.2; color:inherit; }
+.td-title-bar { width:62px; height:4px; margin-bottom:22px; border-radius:4px; background:#2676f5; }
+body.dark .td-title-bar { background:#2d8cff; box-shadow:0 0 12px rgba(45,140,255,.5); }
+
+/* ---------- সামারি কার্ড ---------- */
+.td-stats { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; margin-bottom:24px; }
+
+.td-stat {
+  position:relative; overflow:hidden; display:flex; align-items:center; gap:16px;
+  min-height:128px; padding:20px 22px; border-radius:18px; border:1px solid transparent;
+  box-shadow:0 6px 18px rgba(31,70,130,.08);
+}
+.td-stat::after {
+  content:""; position:absolute; right:-34px; bottom:-46px; width:150px; height:84px;
+  border-radius:50%; opacity:.5; pointer-events:none;
+}
+.td-stat-icon {
+  position:relative; z-index:1; flex:0 0 auto; width:58px; height:58px; display:grid; place-items:center;
+  border-radius:50%;
+}
+.td-stat-icon svg { width:30px; height:30px; }
+.td-stat-body { position:relative; z-index:1; min-width:0; }
+.td-stat-label { font-size:16px; font-weight:800; line-height:1.25; }
+.td-stat-sub { margin-top:2px; font-size:13px; color:#71829f; }
+.td-stat-value { margin-top:6px; font-size:34px; font-weight:800; line-height:1.1; }
+
+.td-stat.green  { background:linear-gradient(135deg,#f0fdf8,#d1fae5); border-color:#a7f3d0; }
+.td-stat.green::after  { background:#a7f3d0; }
+.td-stat.green .td-stat-icon  { color:#059669; background:#a7f3d0; }
+.td-stat.green .td-stat-value { color:#10a86b; }
+
+.td-stat.red    { background:linear-gradient(135deg,#fff5f6,#ffe0e4); border-color:#fecdd3; }
+.td-stat.red::after    { background:#fecdd3; }
+.td-stat.red .td-stat-icon    { color:#e11d48; background:#fecdd3; }
+.td-stat.red .td-stat-value   { color:#f02e49; }
+
+.td-stat.orange { background:linear-gradient(135deg,#fffcf1,#fdeab8); border-color:#fde68a; }
+.td-stat.orange::after { background:#fde68a; }
+.td-stat.orange .td-stat-icon { color:#d97706; background:#fde68a; }
+.td-stat.orange .td-stat-value{ color:#f5a000; }
+
+.td-stat.blue   { background:linear-gradient(135deg,#f3f8ff,#d6e6ff); border-color:#bfdbfe; }
+.td-stat.blue::after   { background:#bfdbfe; }
+.td-stat.blue .td-stat-icon   { color:#2563eb; background:#bfdbfe; }
+.td-stat.blue .td-stat-value  { color:#1680fa; }
+
+body.dark .td-stat { box-shadow:inset 0 0 22px rgba(255,255,255,.02), 0 8px 22px rgba(0,0,0,.26); }
+body.dark .td-stat::after { opacity:.14; }
+body.dark .td-stat-sub { color:#a4b4cf; }
+body.dark .td-stat.green  { background:linear-gradient(135deg,#0a3d31,#07553f); border-color:#0f7a5b; }
+body.dark .td-stat.red    { background:linear-gradient(135deg,#4a1523,#651b2f); border-color:#a1304b; }
+body.dark .td-stat.orange { background:linear-gradient(135deg,#4d3305,#6b4708); border-color:#a8730f; }
+body.dark .td-stat.blue   { background:linear-gradient(135deg,#0d2d63,#123f8c); border-color:#2468d8; }
+body.dark .td-stat.green  .td-stat-icon { color:#63f3b6; background:rgba(16,185,129,.22); }
+body.dark .td-stat.red    .td-stat-icon { color:#ff8da1; background:rgba(244,63,94,.22); }
+body.dark .td-stat.orange .td-stat-icon { color:#ffd078; background:rgba(245,158,11,.22); }
+body.dark .td-stat.blue   .td-stat-icon { color:#8ec5ff; background:rgba(38,118,245,.28); }
+body.dark .td-stat.green  .td-stat-value { color:#63f3b6; }
+body.dark .td-stat.red    .td-stat-value { color:#ff8da1; }
+body.dark .td-stat.orange .td-stat-value { color:#ffd078; }
+body.dark .td-stat.blue   .td-stat-value { color:#8ec5ff; }
+
+/* ---------- গ্রাফ কার্ড ---------- */
+.td-chart-card {
+  padding:22px; border-radius:20px; background:#fff; border:1px solid #e5edf8;
+  box-shadow:0 6px 18px rgba(31,70,130,.08);
+}
+body.dark .td-chart-card {
+  border-color:#203b5e; background:linear-gradient(145deg,#0f1f38,#0a1629);
+  box-shadow:0 10px 26px rgba(0,0,0,.26), inset 0 1px rgba(255,255,255,.025);
+}
+.td-chart-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+.td-chart-title { display:flex; align-items:center; gap:10px; margin:0; font-size:20px; font-weight:800; color:inherit; }
+.td-chart-title svg { width:26px; height:26px; color:#2676f5; }
+body.dark .td-chart-title svg { color:#2d8cff; }
+
+.td-filters { display:flex; gap:4px; padding:4px; border-radius:999px; background:#eef4fd; }
+body.dark .td-filters { background:#0b1a30; }
+.td-filter {
+  padding:9px 16px; border:0; border-radius:999px; font-size:13px; font-weight:700;
+  color:#71829f; background:transparent;
+}
+.td-filter:hover:not(:disabled) { filter:none; color:#2676f5; }
+.td-filter.active, .td-filter.active:hover:not(:disabled) {
+  color:#fff; background:#2676f5; box-shadow:0 3px 10px rgba(38,118,245,.35);
+}
+body.dark .td-filter { color:#a4b4cf; }
+body.dark .td-filter:hover:not(:disabled) { color:#fff; }
+body.dark .td-filter.active, body.dark .td-filter.active:hover:not(:disabled) {
+  background:linear-gradient(100deg,#075de5,#087bff); box-shadow:0 0 16px rgba(0,112,255,.35);
+}
+
+.td-chart { display:block; width:100%; height:auto; overflow:visible; }
+.td-grid { stroke:#e5edf8; stroke-width:1; stroke-dasharray:4 5; }
+.td-axis-line { stroke:#a4b5ce; stroke-width:1.2; }
+.td-axis { fill:#71829f; font-size:13px; }
+.td-line { fill:none; stroke:#2676f5; stroke-width:3.2; stroke-linecap:round; stroke-linejoin:round; }
+.td-dot { fill:#2676f5; stroke:#fff; stroke-width:2; }
+.td-bubble { fill:#2676f5; }
+.td-bubble-text { fill:#fff; font-size:13px; font-weight:700; }
+.td-empty { fill:#71829f; font-size:15px; }
+body.dark .td-grid { stroke:#1d3556; }
+body.dark .td-axis-line { stroke:#3a5478; }
+body.dark .td-axis, body.dark .td-empty { fill:#a9bdd9; }
+body.dark .td-line { stroke:#2d8cff; filter:drop-shadow(0 0 5px rgba(45,140,255,.55)); }
+body.dark .td-dot { fill:#2d8cff; stroke:#0f1f38; }
+body.dark .td-bubble { fill:#1f7cff; }
+
+.td-note { margin:10px 0 0; font-size:12px; text-align:center; color:#71829f; }
+body.dark .td-note { color:#a4b4cf; }
+
+/* ---------- রেসপন্সিভ ---------- */
+@media (max-width:1100px) {
+  .td-stats { grid-template-columns:repeat(2, minmax(0,1fr)); }
+}
+@media (max-width:720px) {
+  .td-stats { gap:10px; }
+  .td-stat { min-height:104px; padding:14px; gap:10px; }
+  .td-stat-icon { width:44px; height:44px; }
+  .td-stat-icon svg { width:23px; height:23px; }
+  .td-stat-label { font-size:13px; }
+  .td-stat-sub { font-size:11px; }
+  .td-stat-value { font-size:26px; }
+  .td-chart-card { padding:14px 10px; }
+  .td-chart-title { font-size:16px; }
+  .td-filter { padding:8px 11px; font-size:12px; }
+}
+@media (max-width:420px) {
+  .td-stats { grid-template-columns:1fr; }
+}
