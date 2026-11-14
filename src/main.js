@@ -1011,6 +1011,41 @@ document.addEventListener('keydown', (e) => {
   resetTest();
 });
 
+// ================= HIGHLIGHT চালু/বন্ধ =================
+
+let showHighlight = true;
+
+try {
+  showHighlight = localStorage.getItem('showHighlight') !== 'off';
+} catch {
+  /* ignore */
+}
+
+function applyHighlightSetting() {
+  $('passage').classList.toggle('no-hl', !showHighlight);
+
+  const btn = $('highlightBtn');
+
+  btn.textContent = showHighlight ? 'Hide Highlight' : 'Show Highlight';
+
+  btn.classList.toggle('hl-on', showHighlight);
+  btn.classList.toggle('hl-off', !showHighlight);
+}
+
+$('highlightBtn').addEventListener('click', () => {
+  showHighlight = !showHighlight;
+
+  try {
+    localStorage.setItem('showHighlight', showHighlight ? 'on' : 'off');
+  } catch {
+    /* ignore */
+  }
+
+  applyHighlightSetting();
+
+  $('typingInput').focus(); // বাটন চাপার পর সরাসরি টাইপিং চালিয়ে যাওয়া যাবে
+});
+
 // ================= DARK MODE =================
 
 function applyTheme(dark) {
@@ -1125,6 +1160,8 @@ $('customPracticeBtn').addEventListener('click', () => {
 
     $('passageManagerBtn').style.display = 'none';
 
+    $('highlightBtn').style.display = 'none';
+
     closeDrawer();
 
     $('customPracticeBtn').textContent = 'Normal Practice';
@@ -1139,6 +1176,8 @@ $('customPracticeBtn').addEventListener('click', () => {
     $('passageSelect').style.display = 'block';
 
     $('passageManagerBtn').style.display = '';
+
+    $('highlightBtn').style.display = '';
 
     $('customPracticeBtn').textContent = 'Customize Practice';
 
@@ -1156,6 +1195,8 @@ $('customPracticeBtn').addEventListener('click', () => {
 // ================= INITIALIZE WEBSITE =================
 
 applyTheme(localStorage.getItem('theme') === 'dark');
+
+applyHighlightSetting();
 
 loadPassages();
 
