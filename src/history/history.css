@@ -1,0 +1,240 @@
+/* =====================================================================
+   src/history/history.css : History পেজের নতুন ডিজাইন
+   সব ক্লাস th- দিয়ে শুরু, তাই সাইটের অন্য স্টাইলের সাথে মিশবে না।
+   ডার্ক মোড: সাইটের Dark Mode বাটন body-তে "dark" ক্লাস বসায়, সেটাই ধরা হয়েছে।
+   ===================================================================== */
+
+.th-wrap { color:#172554; font-family:inherit; }
+body.dark .th-wrap { color:#f1f5ff; }
+
+/* ---------- ওপরের হেডিং ---------- */
+.th-heading {
+  position:relative; overflow:hidden; margin-bottom:18px; padding:22px 25px;
+  border-radius:20px; border:1px solid #ddd6fe;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(196,181,253,.55), transparent 27%),
+    linear-gradient(110deg, #e0e7ff, #f5f3ff 62%, #ede9fe);
+}
+.th-heading::after {
+  content:"⌨"; position:absolute; right:26px; top:-18px; font-size:130px; line-height:1;
+  color:rgba(124,58,237,.10); pointer-events:none;
+}
+.th-heading-row { position:relative; z-index:1; display:flex; align-items:center; gap:16px; }
+.th-heading-icon {
+  width:58px; height:58px; flex:0 0 auto; display:grid; place-items:center; border-radius:17px;
+  font-size:30px; color:#6d28d9; background:rgba(255,255,255,.72);
+}
+.th-title { margin:0; font-size:clamp(23px, 2.5vw, 31px); font-weight:800; line-height:1.25; color:inherit; }
+.th-sub { margin-top:5px; font-size:14px; color:#4c4b83; }
+
+body.dark .th-heading {
+  border-color:#0754b8; box-shadow:inset 0 0 28px rgba(0,100,255,.12);
+  background:
+    radial-gradient(circle at 84% 15%, rgba(0,110,255,.30), transparent 32%),
+    linear-gradient(110deg, #071b42, #0b1b3c 60%, #082d68);
+}
+body.dark .th-heading::after { color:rgba(0,130,255,.14); }
+body.dark .th-heading-icon { color:#36a3ff; background:rgba(4,34,82,.85); border:1px solid #0754b8; }
+body.dark .th-sub { color:#c3d7f5; }
+
+/* ---------- সামারি কার্ড ---------- */
+.th-stats { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:15px; margin-bottom:18px; }
+.th-stat {
+  position:relative; overflow:hidden; min-height:118px; padding:18px 20px;
+  display:flex; align-items:center; gap:15px; border-radius:18px; border:1px solid transparent;
+  box-shadow:0 8px 24px rgba(49,46,129,.08);
+}
+.th-stat::after {
+  content:""; position:absolute; right:-28px; bottom:-42px; width:110px; height:70px;
+  border-radius:50%; opacity:.45; pointer-events:none;
+}
+.th-stat-icon { flex:0 0 auto; font-size:36px; line-height:1; }
+.th-stat-label { margin-bottom:4px; font-size:14px; font-weight:700; }
+.th-stat-value { font-size:27px; font-weight:800; line-height:1.15; overflow-wrap:anywhere; }
+.th-stat-note { margin-top:4px; font-size:12px; color:#475569; }
+
+.th-stat.blue   { color:#1d4ed8; border-color:#bfdbfe; background:linear-gradient(135deg,#eff6ff,#bfdbfe); }
+.th-stat.blue::after { background:#60a5fa; }
+.th-stat.green  { color:#047857; border-color:#bbf7d0; background:linear-gradient(135deg,#ecfdf5,#bbf7d0); }
+.th-stat.green::after { background:#34d399; }
+.th-stat.purple { color:#6d28d9; border-color:#ddd6fe; background:linear-gradient(135deg,#f5f3ff,#ddd6fe); }
+.th-stat.purple::after { background:#a78bfa; }
+.th-stat.orange { color:#c2410c; border-color:#fed7aa; background:linear-gradient(135deg,#fff7ed,#fed7aa); }
+.th-stat.orange::after { background:#fb923c; }
+
+body.dark .th-stat { box-shadow:inset 0 0 22px rgba(255,255,255,.025), 0 8px 22px rgba(0,0,0,.24); }
+body.dark .th-stat::after { opacity:.22; }
+body.dark .th-stat.blue   { color:#80d4ff; border-color:#087bdb; background:linear-gradient(135deg,#06427b,#075dcc 72%,#073a86); }
+body.dark .th-stat.green  { color:#63f3b6; border-color:#059669; background:linear-gradient(135deg,#064c39,#007b50 72%,#005b43); }
+body.dark .th-stat.purple { color:#e2a7ff; border-color:#843cff; background:linear-gradient(135deg,#351078,#5816b7 72%,#32106f); }
+body.dark .th-stat.orange { color:#ffd078; border-color:#f59e0b; background:linear-gradient(135deg,#713500,#a64b00 72%,#713000); }
+body.dark .th-stat-value { color:#f8fbff; }
+body.dark .th-stat-note { color:#e1eaff; }
+
+/* ---------- প্যানেল (গ্রাফ ও টেবিলের বক্স) ---------- */
+.th-panel {
+  margin-bottom:18px; overflow:hidden; border-radius:20px; border:1px solid #e7e5f4;
+  background:#fff; box-shadow:0 8px 24px rgba(49,46,129,.08);
+}
+body.dark .th-panel {
+  border-color:#203b5e; background:linear-gradient(145deg,#0b1729,#081323);
+  box-shadow:0 10px 26px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.025);
+}
+.th-panel-head {
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  padding:20px 22px 8px;
+}
+.th-panel-title { display:flex; align-items:center; gap:12px; }
+.th-panel-icon { font-size:28px; line-height:1; color:#6d28d9; }
+body.dark .th-panel-icon { color:#1595ff; }
+.th-h2 { margin:0; font-size:21px; font-weight:800; line-height:1.3; color:inherit; }
+.th-desc { margin-top:3px; font-size:13px; color:#64748b; }
+body.dark .th-desc { color:#a9bdd9; }
+
+/* ---------- গ্রাফ ---------- */
+.th-periods { display:flex; flex-wrap:wrap; gap:8px; }
+.th-period {
+  padding:9px 15px; border-radius:999px; border:1px solid #ddd6fe;
+  font-size:12px; font-weight:700; color:#4338ca; background:#fff;
+}
+.th-period:hover:not(:disabled) { filter:none; background:#f5f3ff; }
+.th-period.active, .th-period.active:hover:not(:disabled) {
+  color:#fff; border-color:transparent; background:linear-gradient(100deg,#6d28d9,#7c3aed);
+}
+body.dark .th-period { color:#dceaff; background:#0b1a30; border-color:#29466b; }
+body.dark .th-period:hover:not(:disabled) { background:#10213a; }
+body.dark .th-period.active, body.dark .th-period.active:hover:not(:disabled) {
+  color:#fff; border-color:#168cff; background:linear-gradient(100deg,#075de5,#087bff);
+  box-shadow:0 0 16px rgba(0,112,255,.30);
+}
+
+.th-chart-wrap { padding:4px 20px 16px; }
+.th-legend { display:flex; justify-content:center; gap:22px; margin:6px 0; font-size:13px; font-weight:700; color:#475569; }
+body.dark .th-legend { color:#e2ecff; }
+.th-dot { display:inline-block; width:9px; height:9px; margin-right:6px; border-radius:50%; }
+.th-dot.blue { background:#2563eb; }
+.th-dot.green { background:#10b981; }
+.th-chart { display:block; width:100%; height:auto; }
+.th-grid { stroke:#e9e5f5; stroke-width:1; }
+.th-axis { fill:#64748b; font-size:11px; }
+.th-empty-svg { fill:#64748b; font-size:14px; }
+.th-dot-ring { stroke:#fff; stroke-width:2; }
+body.dark .th-grid { stroke:#1b3552; }
+body.dark .th-axis, body.dark .th-empty-svg { fill:#c4d5ed; }
+body.dark .th-dot-ring { stroke:#0b1729; }
+
+/* ---------- সার্চ ও ফিল্টার ---------- */
+.th-tools { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.th-search { position:relative; }
+.th-search-ico { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:16px; color:#64748b; pointer-events:none; }
+.th-input, .th-select {
+  padding:10px 12px; border-radius:12px; border:1px solid #ddd6fe; outline:none;
+  font-size:14px; font-weight:600; color:#172554; background:#fff;
+}
+.th-input { width:235px; padding-left:38px; }
+.th-input:focus, .th-select:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px #ede9fe; }
+body.dark .th-search-ico { color:#a9c7ed; }
+body.dark .th-input, body.dark .th-select { color:#eaf2ff; background:#0b1a30; border-color:#29466b; }
+body.dark .th-input::placeholder { color:#91a8c8; }
+body.dark .th-input:focus, body.dark .th-select:focus { border-color:#168cff; box-shadow:0 0 0 3px rgba(0,112,255,.25); }
+body.dark .th-select option { color:#eaf2ff; background:#0b1a30; }
+
+/* ---------- টেবিল ---------- */
+.th-table-scroll { overflow-x:auto; padding:8px 12px 14px; }
+.th-table { width:100%; min-width:820px; border-collapse:separate; border-spacing:0; }
+.th-table thead th {
+  padding:13px 14px; text-align:left; white-space:nowrap; font-size:13px; font-weight:700; color:#fff;
+  background:linear-gradient(100deg,#5b21b6,#7c3aed);
+}
+.th-table thead th:first-child { border-radius:12px 0 0 0; }
+.th-table thead th:last-child { border-radius:0 12px 0 0; }
+.th-table tbody td { padding:12px 14px; white-space:nowrap; font-size:13px; border-bottom:1px solid #eeeaf8; vertical-align:middle; }
+.th-table tbody tr:hover { background:#faf8ff; }
+.th-time-small { display:block; margin-top:2px; font-size:11px; color:#64748b; }
+body.dark .th-table thead th { background:linear-gradient(100deg,#4210a5,#5b16d5); }
+body.dark .th-table tbody td { color:#e6efff; border-bottom-color:#1b304b; }
+body.dark .th-table tbody tr:hover { background:#10213a; }
+body.dark .th-time-small { color:#9fb5d4; }
+
+.th-mode { display:inline-block; min-width:66px; padding:5px 11px; border-radius:999px; text-align:center; font-size:12px; font-weight:700; }
+.th-mode.en { color:#1d4ed8; background:#dbeafe; }
+.th-mode.bn { color:#047857; background:#d1fae5; }
+.th-mode.custom { color:#6d28d9; background:#ede9fe; }
+body.dark .th-mode.en { color:#b8dcff; background:#073d79; }
+body.dark .th-mode.bn { color:#9cf5cf; background:#07543e; }
+body.dark .th-mode.custom { color:#e1c2ff; background:#48138a; }
+
+.th-acc { display:inline-block; min-width:54px; padding:5px 10px; border-radius:999px; text-align:center; font-weight:800; color:#047857; background:#d1fae5; }
+.th-acc.mid { color:#b45309; background:#fef3c7; }
+.th-acc.low { color:#b91c1c; background:#fee2e2; }
+.th-acc.na  { color:#475569; background:#e2e8f0; }
+body.dark .th-acc { color:#9cf5cf; background:#07543e; }
+body.dark .th-acc.mid { color:#fde68a; background:#6b4500; }
+body.dark .th-acc.low { color:#fecaca; background:#7a1d1d; }
+body.dark .th-acc.na  { color:#cbd5e1; background:#334155; }
+
+.th-view-btn {
+  padding:7px 15px; border:0; border-radius:999px; font-size:13px; font-weight:700; color:#fff;
+  background:linear-gradient(100deg,#6d28d9,#7c3aed);
+}
+body.dark .th-view-btn { background:linear-gradient(100deg,#5b16d5,#842bff); box-shadow:0 0 12px rgba(124,58,237,.25); }
+
+.th-empty { display:none; padding:25px; text-align:center; color:#64748b; }
+body.dark .th-empty { color:#9fb5d4; }
+.th-more-row { display:none; padding:4px 12px 16px; text-align:center; }
+.th-more-btn {
+  padding:9px 22px; border-radius:999px; border:1px solid #ddd6fe; font-size:13px; font-weight:700;
+  color:#4338ca; background:#fff;
+}
+body.dark .th-more-btn { color:#dceaff; background:#0b1a30; border-color:#29466b; }
+
+/* ---------- ডিটেইলস পপআপ (body-তে বসে) ---------- */
+.th-modal-backdrop {
+  position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center;
+  padding:20px; background:rgba(15,23,42,.48);
+}
+.th-modal-backdrop.show { display:flex; }
+.th-modal {
+  width:min(480px, 100%); max-height:90vh; overflow-y:auto; padding:24px; border-radius:20px;
+  color:#172554; background:#fff; box-shadow:0 20px 60px rgba(15,23,42,.25);
+}
+.th-modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.th-modal-head h3 { margin:0; font-size:20px; }
+.th-close { width:34px; height:34px; padding:0; border:0; border-radius:50%; font-size:20px; line-height:1; color:#172554; background:#f1f5f9; }
+.th-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.th-detail { padding:12px; border-radius:12px; border:1px solid #eeeaf8; background:#f8f7ff; min-width:0; }
+.th-detail small { display:block; margin-bottom:5px; color:#64748b; }
+.th-detail strong { font-size:16px; overflow-wrap:anywhere; }
+.th-detail.wide { grid-column:1 / -1; }
+body.dark .th-modal-backdrop { background:rgba(0,5,16,.78); }
+body.dark .th-modal { color:#f1f5ff; background:#0c192c; border:1px solid #29466b; }
+body.dark .th-close { color:#eaf2ff; background:#1b304b; }
+body.dark .th-detail { background:#10213a; border-color:#29415f; }
+body.dark .th-detail small { color:#a9bdd9; }
+
+/* ---------- রেসপন্সিভ ---------- */
+@media (max-width:1100px) {
+  .th-stats { grid-template-columns:repeat(2, minmax(0,1fr)); }
+}
+@media (max-width:720px) {
+  .th-heading { padding:17px; }
+  .th-heading-icon { width:46px; height:46px; font-size:24px; }
+  .th-stats { gap:9px; }
+  .th-stat { min-height:96px; padding:13px; gap:9px; }
+  .th-stat-icon { font-size:26px; }
+  .th-stat-value { font-size:20px; }
+  .th-stat-label { font-size:12px; }
+  .th-stat-note { font-size:10px; }
+  .th-panel-head { flex-direction:column; align-items:flex-start; padding:16px 15px 8px; }
+  .th-periods { width:100%; }
+  .th-period { flex:1; padding:8px 6px; }
+  .th-chart-wrap { padding:4px 10px 12px; }
+  .th-tools { width:100%; }
+  .th-search { flex:1; }
+  .th-input { width:100%; }
+}
+@media (max-width:420px) {
+  .th-stats { grid-template-columns:1fr; }
+  .th-tools { flex-direction:column; align-items:stretch; }
+  .th-detail-grid { grid-template-columns:1fr; }
+}
