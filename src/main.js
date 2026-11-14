@@ -1020,6 +1020,7 @@ $('themeBtn').addEventListener('click', () => {
 
 const sections = {
   home: $('homePage'),
+  subscription: $('subscriptionPage'),
   practice: $('practicePage'),
   dashboard: $('dashboardPage'),
   history: $('historyPage'),
@@ -1027,6 +1028,7 @@ const sections = {
 
 const navs = {
   home: $('navHome'),
+  subscription: $('navSubscription'),
   practice: $('navPractice'),
   dashboard: $('navDashboard'),
   history: $('navHistory'),
@@ -1062,6 +1064,40 @@ Object.keys(navs).forEach((k) =>
 
 $('goToPracticeBtn').addEventListener('click', () => {
   showSection('practice');
+});
+
+// ================= SUBSCRIPTION (প্ল্যান বেছে নিলে পেমেন্ট তথ্য দেখায়) =================
+
+const planCards = document.querySelectorAll('.plan-card');
+
+planCards.forEach((card) => {
+  card.addEventListener('click', () => {
+    planCards.forEach((c) => c.classList.remove('selected'));
+
+    card.classList.add('selected');
+
+    $('selectedPlan').textContent = `Selected: ${card.dataset.name} — ${card.dataset.price} TK`;
+
+    $('paymentBox').style.display = 'block';
+
+    $('paymentBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+});
+
+$('copyNumberBtn').addEventListener('click', async () => {
+  const btn = $('copyNumberBtn');
+
+  try {
+    await navigator.clipboard.writeText('01743775043');
+
+    btn.textContent = '✔ Copied';
+  } catch {
+    btn.textContent = 'Copy হয়নি';
+  }
+
+  setTimeout(() => {
+    btn.textContent = 'Copy';
+  }, 1500);
 });
 
 // ================= CUSTOM PRACTICE MODE =================
