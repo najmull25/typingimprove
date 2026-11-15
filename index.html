@@ -40,11 +40,16 @@ body.dark .passage span.bad { color:#f87171; }
    বাংলা অক্ষর আপনা-আপনি Noto Serif Bengali থেকে, ইংরেজি Noto Serif থেকে আসে। */
 :root { --typing-font:'Noto Serif','Noto Serif Bengali','Times New Roman',serif; }
 #practicePage .passage, #practicePage #typingInput {
-  font-family:var(--typing-font); font-weight:500; font-size:1.5rem; line-height:2.05; letter-spacing:.1px;
+  font-family:var(--typing-font); font-weight:500; font-size:1.6rem; line-height:2.05; letter-spacing:.1px;
 }
 #practicePage[data-lang="bn"] .passage, #practicePage[data-lang="bn"] #typingInput { font-size:1.7rem; line-height:2; letter-spacing:0; }
 body:not(.dark) #practicePage .passage, body:not(.dark) #practicePage #typingInput { color:#0f172a; }
 #practicePage #typingInput::placeholder { font-weight:400; opacity:.55; }
+
+/* ===== বক্সের উচ্চতা: উপরের প্যাসেজ বড়, নিচের টাইপিং বক্স ছোট ===== */
+#practicePage .passage { height:550px; }
+#practicePage #typingInput { height:150px; min-height:150px; max-height:150px; }
+
 body.dark #typingInput { background:#1e293b; color:#f8fafc; }
 .timer { font-size:2rem; font-weight:bold; text-align:center; margin:20px 0 5px; color:#ef4444; }
 .live-stats { text-align:center; font-weight:600; font-size:1.1rem; color:#64748b; margin-bottom:15px; }
