@@ -1,5 +1,7 @@
 import { defaultPassages } from './passages.js';
 
+import { compareText, isPassageComplete, shouldBlockSpace, renderPassageHtml } from './compare.js';
+
 const $ = (id) => document.getElementById(id);
 
 // য়, ড়, ঢ় দুইভাবে লেখা যায় (একক অক্ষর বা মূল অক্ষর + নুক্তা)।
@@ -110,57 +112,15 @@ function escapeHTML(text) {
 }
 
 // ================= LIVE HIGHLIGHT (সবুজ = ঠিক, লাল = ভুল) =================
-
-let segmentCache = { text: null, segments: [] };
-
-// বাংলা যুক্তাক্ষর যাতে ভেঙে না যায়, তাই grapheme ধরে ভাগ করা হয়
-function getSegments(text) {
-  if (segmentCache.text === text) return segmentCache.segments;
-
-  const segments =
-    typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function'
-      ? Array.from(
-          new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text),
-          (s) => s.segment
-        )
-      : Array.from(text);
-
-  segmentCache = { text, segments };
-
-  return segments;
-}
+// শব্দ ধরে মেলানোর নিয়ম src/compare.js ফাইলে আছে।
+// স্পেস দিয়ে পরের শব্দে গেলে আগের শব্দের ভুলের প্রভাব পরের শব্দে পড়ে না।
 
 function renderHighlight() {
   const box = $('passage');
 
   if (!box || isCustomMode) return;
 
-  const text = getCurrentPassage();
-  const typed = Array.from(normalizeBangla($('typingInput').value));
-  const segments = getSegments(text);
-
-  let position = 0;
-  let currentMarked = false;
-  let html = '';
-
-  for (const segment of segments) {
-    const length = Array.from(segment).length;
-
-    let cls = '';
-
-    if (typed.length >= position + length) {
-      cls = typed.slice(position, position + length).join('') === segment ? 'ok' : 'bad';
-    } else if (!currentMarked) {
-      cls = 'cur';
-      currentMarked = true;
-    }
-
-    html += `<span class="${cls}">${escapeHTML(segment)}</span>`;
-
-    position += length;
-  }
-
-  box.innerHTML = html;
+  box.innerHTML = renderPassageHtml(getCurrentPassage(), normalizeBangla($('typingInput').value));
 
   const cur = box.querySelector('.cur');
 
@@ -298,36 +258,17 @@ function updateStats() {
     wordWpm = Math.round(totalTypedWords / elapsedMinutes);
   }
 
-  let correctCharacters = 0;
   let mistakes = 0;
   let correctWordCount = 0;
   let accuracy = 100;
 
   if (!isCustomMode) {
-    const targetText = getCurrentPassage();
+    // শব্দ ধরে মাপা হয়: এক শব্দের ভুল পরের শব্দকে প্রভাবিত করে না (src/compare.js)
+    const result = compareText(typedText, getCurrentPassage());
 
-    const target = Array.from(targetText);
-
-    for (let i = 0; i < input.length; i++) {
-      if (input[i] === target[i]) {
-        correctCharacters++;
-      } else {
-        mistakes++;
-      }
-    }
-
-    accuracy =
-      totalCharacters > 0
-        ? Math.round((correctCharacters / totalCharacters) * 100)
-        : 100;
-
-    const targetWords = getWords(targetText);
-
-    for (let i = 0; i < typedWords.length; i++) {
-      if (targetWords[i] !== undefined && typedWords[i] === targetWords[i]) {
-        correctWordCount++;
-      }
-    }
+    mistakes = result.wrongChars;
+    accuracy = result.accuracy;
+    correctWordCount = result.correctWords;
   }
 
   $('wpmWithSpace').textContent = wpmWithSpace;
@@ -903,10 +844,7 @@ typingBox.addEventListener('input', () => {
 
   renderHighlight();
 
-  if (
-    !isCustomMode &&
-    Array.from(normalizeBangla(typingBox.value)).length >= Array.from(getCurrentPassage()).length
-  ) {
+  if (!isCustomMode && isPassageComplete(normalizeBangla(typingBox.value), getCurrentPassage())) {
     finishTest();
   }
 });
@@ -922,11 +860,9 @@ typingBox.addEventListener('beforeinput', (e) => {
 
   if (e.inputType !== 'insertText' || e.data !== ' ') return;
 
-  const typedLength = Array.from(normalizeBangla(typingBox.value)).length;
-
-  const expected = Array.from(getCurrentPassage())[typedLength];
-
-  if (expected === '\n') e.preventDefault();
+  if (shouldBlockSpace(normalizeBangla(typingBox.value), getCurrentPassage())) {
+    e.preventDefault();
+  }
 });
 
 // ================= USE MY OWN TEXT (সাময়িক, সেভ হয় না) =================
@@ -955,7 +891,14 @@ $('usePassageBtn').addEventListener('click', () => {
 
 // ================= LANGUAGE / PASSAGE / DURATION CHANGE =================
 
+// ভাষা অনুযায়ী প্যাসেজ ও টাইপিং বক্সের ফন্ট সাইজ বদলায় (CSS-এ data-lang দেখা হয়)
+function applyTypingFont() {
+  $('practicePage').dataset.lang = $('language').value;
+}
+
 $('language').addEventListener('change', () => {
+  applyTypingFont();
+
   tempPassage = '';
 
   loadPassages();
@@ -1211,6 +1154,8 @@ $('customPracticeBtn').addEventListener('click', () => {
 applyTheme(localStorage.getItem('theme') === 'dark');
 
 applyHighlightSetting();
+
+applyTypingFont();
 
 loadPassages();
 
