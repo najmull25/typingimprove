@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<!-- প্যাসেজ ও টাইপিং বক্সের পরিষ্কার ফন্ট: বাংলার জন্য Noto Serif Bengali, ইংরেজির জন্য Noto Serif -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600&family=Noto+Serif:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
 * { box-sizing: border-box; }
@@ -32,6 +34,17 @@ body.dark .passage span.ok { color:#4ade80; }
 body.dark .passage span.bad { color:#f87171; }
 #typingInput { display:block; width:100%; height:260px; min-height:260px; max-height:260px; padding:20px; margin-bottom:15px; font-size:1.325rem; line-height:1.9; border:0; border-left:5px solid transparent; border-radius:8px; resize:none; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap; overflow-wrap:break-word; word-break:normal; }
 #typingInput:focus { outline:2px solid #3b82f6; }
+
+/* ===== পড়ার সুবিধার ফন্ট (প্যাসেজ ও টাইপিং বক্স) =====
+   ফন্ট বদলাতে চাইলে শুধু নিচের --typing-font লাইনটা বদলান।
+   বাংলা অক্ষর আপনা-আপনি Noto Serif Bengali থেকে, ইংরেজি Noto Serif থেকে আসে। */
+:root { --typing-font:'Noto Serif','Noto Serif Bengali','Times New Roman',serif; }
+#practicePage .passage, #practicePage #typingInput {
+  font-family:var(--typing-font); font-weight:500; font-size:1.2rem; line-height:2.05; letter-spacing:.1px;
+}
+#practicePage[data-lang="bn"] .passage, #practicePage[data-lang="bn"] #typingInput { font-size:1.5rem; line-height:2; letter-spacing:0; }
+body:not(.dark) #practicePage .passage, body:not(.dark) #practicePage #typingInput { color:#0f172a; }
+#practicePage #typingInput::placeholder { font-weight:400; opacity:.55; }
 body.dark #typingInput { background:#1e293b; color:#f8fafc; }
 .timer { font-size:2rem; font-weight:bold; text-align:center; margin:20px 0 5px; color:#ef4444; }
 .live-stats { text-align:center; font-weight:600; font-size:1.1rem; color:#64748b; margin-bottom:15px; }
@@ -185,6 +198,8 @@ body.dark .drawer-header { border-bottom-color:#334155; }
 
 /* ===== মোবাইল ===== */
 @media (max-width:720px) {
+  #practicePage .passage, #practicePage #typingInput { font-size:1.05rem; line-height:1.95; }
+  #practicePage[data-lang="bn"] .passage, #practicePage[data-lang="bn"] #typingInput { font-size:1.3rem; line-height:1.9; }
   .passage, #typingInput { height:220px; min-height:220px; max-height:220px; font-size:1.1rem; }
   .result-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .result-card { padding:16px 8px; }
